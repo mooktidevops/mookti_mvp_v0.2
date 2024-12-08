@@ -6,7 +6,11 @@
     "dev": "next dev --turbo",
     "build": "tsx db/migrate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed-content-chunk": "tsx scripts/seedContentChunk.ts",
+    "db:generate": "drizzle-kit generate --dialect=postgresql --schema=./db/schema.ts",
+    "db:push": "drizzle-kit push",
+    "delete-old-content-chunks": "tsx scripts/deleteOldContentChunks.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.60",

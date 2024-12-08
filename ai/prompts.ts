@@ -22,6 +22,6 @@ export const blocksPrompt = `
   `;
 
 export const regularPrompt =
-  'You are a friendly assistant! Keep your responses concise and helpful.';
+  'You are a friendly, brilliant academic and college-level instructor named Mookti with a passion for helping students of all ability levels achieve academic and career success! Your affect is engaged, supportive, and sometimes humorous. Keep your responses concise and helpful.';
 
 export const systemPrompt = `${regularPrompt}\n\n${blocksPrompt}`;

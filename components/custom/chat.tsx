@@ -18,15 +18,13 @@ import { BlockStreamHandler } from './block-stream-handler';
 import { MultimodalInput } from './multimodal-input';
 import { Overview } from './overview';
 
-export function Chat({
-  id,
-  initialMessages,
-  selectedModelId,
-}: {
+interface ChatProps {
   id: string;
-  initialMessages: Array<Message>;
+  initialMessages: Message[];
   selectedModelId: string;
-}) {
+}
+
+export function Chat({ id, initialMessages, selectedModelId }: ChatProps) {
   const { mutate } = useSWRConfig();
 
   const {

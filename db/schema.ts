@@ -9,7 +9,23 @@ import {
   primaryKey,
   foreignKey,
   boolean,
+  integer,
 } from 'drizzle-orm/pg-core';
+
+import { ContentChunk } from '@/lib/types/contentChunk';
+
+export const contentChunk = pgTable('ContentChunk', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  moduleId: integer('moduleId').notNull(),
+  chunkId: integer('chunkId').notNull(),
+  title: varchar('title', { length: 255 }),
+  description: text('description'),
+  type: varchar('type', { length: 50 }).notNull(),
+  nextAction: varchar('nextAction', { length: 50 }).notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+});
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),

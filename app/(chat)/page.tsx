@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 
 import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
 import { Chat } from '@/components/custom/chat';
+import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk'; // We'll create this function
 import { generateUUID } from '@/lib/utils';
 
 export default async function Page() {
@@ -14,11 +15,25 @@ export default async function Page() {
     models.find((model) => model.id === modelIdFromCookie)?.id ||
     DEFAULT_MODEL_NAME;
 
+  // Fetch the initial content chunk
+  const initialContentChunk = await getInitialContentChunk();
+
+  // Convert the content chunk to a message format
+  const initialMessages = initialContentChunk
+    ? [
+        {
+          id: generateUUID(),
+          role: 'system' as 'system',
+          content: initialContentChunk.content,
+        },
+      ]
+    : [];
+
   return (
     <Chat
       key={id}
       id={id}
-      initialMessages={[]}
+      initialMessages={initialMessages}
       selectedModelId={selectedModelId}
     />
   );
