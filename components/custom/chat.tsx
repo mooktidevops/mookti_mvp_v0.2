@@ -3,7 +3,7 @@
 import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useWindowSize } from 'usehooks-ts';
 
@@ -24,7 +24,7 @@ interface ChatProps {
   id: string;
   initialMessages: Message[];
   selectedModelId: string;
-  initialChunk?: ContentChunk | null; // Added prop for passing the real ContentChunk
+  initialChunk?: ContentChunk | null;
 }
 
 export function Chat({ id, initialMessages, selectedModelId, initialChunk }: ChatProps) {
@@ -93,22 +93,7 @@ export function Chat({ id, initialMessages, selectedModelId, initialChunk }: Cha
     console.log("Current chunk after initial set:", currentChunk);
   }, [currentChunk]);
 
-  useEffect(() => {
-    if (!currentChunk) return;
-
-    if (currentChunk.nextAction === 'checkIn') {
-      setShowCheckInButtons(true);
-    } else {
-      setShowCheckInButtons(false);
-    }
-
-    if (currentChunk.nextAction === 'getNext') {
-      // Automatically fetch next chunk without user input
-      fetchNextChunk(currentChunk, 'moveon');
-    }
-  }, [currentChunk]);
-
-  const fetchNextChunk = async (current: ContentChunk, response: 'moveon' | 'tellmemore') => {
+  const fetchNextChunk = useCallback(async (current: ContentChunk, response: 'moveon' | 'tellmemore') => {
     console.log('Fetching next chunk, current:', current, 'response:', response);
     try {
       const res = await fetch('/api/nextContentChunk', {
@@ -153,7 +138,21 @@ export function Chat({ id, initialMessages, selectedModelId, initialChunk }: Cha
     } catch (error) {
       console.error('Error fetching next chunk:', error);
     }
-  };
+  }, [setCurrentChunk, setMessages, setShowCheckInButtons]);
+
+  useEffect(() => {
+    if (!currentChunk) return;
+
+    if (currentChunk.nextAction === 'checkIn') {
+      setShowCheckInButtons(true);
+    } else {
+      setShowCheckInButtons(false);
+    }
+
+    if (currentChunk.nextAction === 'getNext') {
+      fetchNextChunk(currentChunk, 'moveon');
+    }
+  }, [currentChunk, fetchNextChunk]);
 
   const handleCheckInResponse = async (response: 'moveon' | 'tellmemore') => {
     if (!currentChunk) return;
@@ -235,7 +234,7 @@ export function Chat({ id, initialMessages, selectedModelId, initialChunk }: Cha
                 Tell me more
               </Button>
               <Button type="button" onClick={() => handleCheckInResponse('moveon')}>
-                Let's keep going
+                Let&apos;s keep going
               </Button>
             </div>
           )}
