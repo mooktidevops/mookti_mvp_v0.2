@@ -70,7 +70,7 @@ export function MultimodalInput({
     chatRequestOptions?: ChatRequestOptions
   ) => void;
   className?: string;
-  showCheckInButtons: boolean;
+  showCheckInButtons?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
