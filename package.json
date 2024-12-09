@@ -9,8 +9,7 @@
     "lint": "next lint",
     "seed-content-chunk": "tsx scripts/seedContentChunk.ts",
     "db:generate": "drizzle-kit generate --dialect=postgresql --schema=./db/schema.ts",
-    "db:push": "drizzle-kit push",
-    "delete-old-content-chunks": "tsx scripts/deleteOldContentChunks.ts"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.60",

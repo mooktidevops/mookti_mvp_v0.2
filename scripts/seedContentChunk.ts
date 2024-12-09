@@ -19,12 +19,12 @@ const seedContentChunk = async () => {
   try {
     const result = await db.insert(contentChunk).values({
       moduleId: 1,
-      chunkId: 1,
-      title: "Welcome to Collaborative Work Environments",
-      description: "An introduction to working effectively in corporate teams.",
+      chunkId: 2,
+      title: "Welcome to Collaborative Work Environments 2",
+      description: "Module Description",
       type: "introduction",
-      nextAction: "getnext",
-      content: "Welcome to our course on Collaborative Work Environments! In this module, we'll explore key strategies for success in corporate teams. Whether you're a recent graduate or transitioning into a new role, these skills will be invaluable in your career. Let's begin by understanding the importance of effective communication in diverse teams.",
+      nextAction: "checkIn",
+      content: "Over the course of this module, you will learn evidence-based strategies for working in close-knit teams. Many new graduates report lacking this skillset when they start working, so by completing this module, you'll be set up for success in your new career!",
     }).returning();
 
     console.log("Seeded ContentChunk:", result);

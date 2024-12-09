@@ -48,6 +48,7 @@ export function MultimodalInput({
   append,
   handleSubmit,
   className,
+  showCheckInButtons,
 }: {
   chatId: string;
   input: string;
@@ -69,6 +70,7 @@ export function MultimodalInput({
     chatRequestOptions?: ChatRequestOptions
   ) => void;
   className?: string;
+  showCheckInButtons: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -316,6 +318,11 @@ export function MultimodalInput({
       >
         <PaperclipIcon size={14} />
       </Button>
+      {!showCheckInButtons && (
+        <Button type="submit" disabled={isLoading}>
+          Send message
+        </Button>
+      )}
     </div>
   );
 }

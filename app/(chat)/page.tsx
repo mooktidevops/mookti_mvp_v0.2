@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 
 import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
 import { Chat } from '@/components/custom/chat';
-import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk'; // We'll create this function
+import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk'; 
 import { generateUUID } from '@/lib/utils';
 
 export default async function Page() {
@@ -35,6 +35,7 @@ export default async function Page() {
       id={id}
       initialMessages={initialMessages}
       selectedModelId={selectedModelId}
+      initialChunk={initialContentChunk} 
     />
   );
 }
