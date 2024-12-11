@@ -2,8 +2,8 @@ import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 
-import { models, DEFAULT_MODEL_NAME } from '@/ai/models';
-import { regularPrompt } from '@/ai/prompts';
+import { models, DEFAULT_MODEL_NAME } from '@/helpers/ai/models';
+import { regularPrompt } from '@/helpers/ai/prompts';
 
 const defaultModel = models.find((m) => m.id === DEFAULT_MODEL_NAME);
 if (!defaultModel) {

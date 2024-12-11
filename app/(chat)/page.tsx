@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 
-import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
 import { Chat } from '@/components/custom/chat';
+import { DEFAULT_MODEL_NAME, models } from '@/helpers/ai/models';
 import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk'; 
 import { generateUUID } from '@/lib/utils';
 

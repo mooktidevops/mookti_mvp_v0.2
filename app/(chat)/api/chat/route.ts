@@ -7,10 +7,10 @@ import {
 } from 'ai';
 import { z } from 'zod';
 
-import { customModel } from '@/ai';
-import { models } from '@/ai/models';
-import { blocksPrompt, regularPrompt, systemPrompt } from '@/ai/prompts';
-import { auth } from '@/app/(auth)/auth';
+import { customModel } from '@/ai/ai';
+import { models } from '@/ai/ai/models';
+import { blocksPrompt, regularPrompt, systemPrompt } from '@/ai/ai/prompts';
+import { auth } from '@/lib/auth';
 import {
   deleteChatById,
   getChatById,

@@ -2,8 +2,8 @@ import { CoreMessage } from 'ai';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
-import { auth } from '@/app/(auth)/auth';
+import { DEFAULT_MODEL_NAME, models } from '@/ai/ai/models';
+import { auth } from '@/lib/auth';
 import { Chat as PreviewChat } from '@/components/custom/chat';
 import { getChatById, getMessagesByChatId } from '@/db/queries';
 import { convertToUIMessages } from '@/lib/utils';
