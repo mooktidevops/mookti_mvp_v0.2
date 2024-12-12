@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "seed-content-chunk": "tsx scripts/seedContentChunk.ts",
+    "seed-modules": "tsx scripts/seedModules.ts",
+    "seed-learning-path-modules": "tsx scripts/seedLearningPathModules.ts",
+    "seed-learning-paths": "tsx scripts/seedLearningPaths.ts",
+    "seed-media-assets": "tsx scripts/seedMediaAssets.ts",
     "db:generate": "drizzle-kit generate --dialect=postgresql --schema=./db/schema.ts",
     "db:push": "drizzle-kit push"
   },

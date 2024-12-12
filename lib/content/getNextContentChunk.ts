@@ -1,8 +1,8 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, gt } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-import { contentChunk } from '@/db/schema';
+import { contentChunks } from '@/db/schema';
 import { ContentChunk } from '@/lib/types/contentChunk';
 
 export async function getNextContentChunk(currentChunk: ContentChunk): Promise<ContentChunk | null> {
@@ -19,38 +19,20 @@ export async function getNextContentChunk(currentChunk: ContentChunk): Promise<C
     if (currentChunk.nextAction === 'getNext') {
       // Fetch the next chunk in the same module
       const result = await db.select()
-        .from(contentChunk)
+        .from(contentChunks)
         .where(and(
-          eq(contentChunk.moduleId, currentChunk.moduleId),
-          eq(contentChunk.chunkId, currentChunk.chunkId + 1)
+          eq(contentChunks.moduleId, currentChunk.moduleId),
+          gt(contentChunks.order, currentChunk.order)
         ))
+        .orderBy(contentChunks.order)
         .limit(1);
 
       if (result.length > 0) {
         nextChunk = result[0] as ContentChunk;
       }
-    } else if (currentChunk.nextAction === 'nextModule') {
-      // Fetch the first chunk of the next module
-      const result = await db.select()
-        .from(contentChunk)
-        .where(and(
-          eq(contentChunk.moduleId, currentChunk.moduleId + 1),
-          eq(contentChunk.chunkId, 1)
-        ))
-        .limit(1);
-
-      if (result.length > 0) {
-        nextChunk = result[0] as ContentChunk;
-      }
-    } else {
-      console.warn(`Unexpected nextAction: ${currentChunk.nextAction}`);
-      return null;
     }
 
     return nextChunk;
-  } catch (error) {
-    console.error("Error fetching next content chunk:", error);
-    return null;
   } finally {
     await connection.end();
   }

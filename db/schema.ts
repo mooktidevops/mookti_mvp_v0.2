@@ -10,21 +10,72 @@ import {
   foreignKey,
   boolean,
   integer,
+  uniqueIndex
 } from 'drizzle-orm/pg-core';
 
-import { ContentChunk } from '@/lib/types/contentChunk';
+// import { ContentChunk } from '@/lib/types/contentChunk';
 
-export const contentChunk = pgTable('ContentChunk', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  moduleId: integer('moduleId').notNull(),
-  chunkId: integer('chunkId').notNull(),
-  title: varchar('title', { length: 255 }),
+export const learningPaths = pgTable('learning_paths', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
   description: text('description'),
-  type: varchar('type', { length: 50 }).notNull(),
-  nextAction: varchar('nextAction', { length: 50 }).notNull(),
+  slug: text('slug').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    slugIndex: uniqueIndex('learning_paths_slug_key').on(table.slug),
+  };
+});
+
+export const modules = pgTable('modules', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  slug: text('slug').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    slugIndex: uniqueIndex('modules_slug_key').on(table.slug),
+  };
+});
+
+export const learningPathModules = pgTable('learning_path_modules', {
+  learningPathId: uuid('learning_path_id').notNull().references(() => learningPaths.id),
+  moduleId: uuid('module_id').notNull().references(() => modules.id),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => {
+  return {
+    pk: { primaryKey: [table.learningPathId, table.moduleId] },
+  };
+});
+
+export const mediaAssets = pgTable('media_assets', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  url: text('url').notNull(),
+  type: text('type', { enum: ['image', 'video'] }).notNull(),
+  altText: text('alt_text'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const contentChunks = pgTable('content_chunks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  moduleId: uuid('module_id').notNull().references(() => modules.id),
+  order: integer('sequence_order').notNull(),
+  title: text('title'),
+  description: text('description'),
+  type: text('type', {
+    enum: ['lesson', 'metalesson', 'introduction', 'conclusion', 'example', 'application', 'image', 'video']
+  }).notNull(),
+  nextAction: text('next_action', {
+    enum: ['getNext', 'checkIn', 'assessment', 'studio', 'nextModule']
+  }).notNull(),
   content: text('content').notNull(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+  mediaAssetId: uuid('media_asset_id').references(() => mediaAssets.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const user = pgTable('User', {
