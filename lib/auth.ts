@@ -1,15 +1,10 @@
 import { compare } from "bcrypt-ts";
-import NextAuth, { User, Session } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 
 import { authConfig } from "@/app/(auth)/auth.config";
 import { getUser } from "@/db/queries";
-
-
-interface ExtendedSession extends Session {
-  user: User;
-}
 
 export const {
   handlers,
@@ -20,6 +15,7 @@ export const {
   ...authConfig,
   providers: [
     Credentials({
+      name: "Credentials",
       credentials: {
         email: {
           label: "Email",
@@ -32,22 +28,31 @@ export const {
         }
       },
       async authorize(credentials) {
-        // Ensure credentials is defined and the properties are present
-        if (!credentials?.email || !credentials?.password) {
+        // First, ensure credentials is defined
+        if (!credentials) {
           return null;
         }
 
-        const email = credentials.email as string;
-        const password = credentials.password as string;
+        // Check if credentials.email and credentials.password exist and are strings
+        if (typeof credentials.email !== 'string' || typeof credentials.password !== 'string') {
+          return null;
+        }
 
+        const { email, password } = credentials;
         const users = await getUser(email);
+
         if (users.length === 0) return null;
 
-        const passwordsMatch = await compare(password, users[0].password!);
-        if (passwordsMatch) {
-          return users[0] as User;
-        }
-        return null;
+        const dbUser = users[0];
+        const passwordsMatch = await compare(password, dbUser.password!);
+        if (!passwordsMatch) return null;
+
+        // At this point, email and password are known strings
+        return {
+          id: dbUser.id,
+          email: dbUser.email,
+          role: dbUser.role,
+        };
       },
     }),
     GitHub({
@@ -58,13 +63,15 @@ export const {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = (user as any).id || token.id;
+        token.id = user.id;
+        token.role = user.role; 
       }
       return token;
     },
-    async session({ session, token }: { session: ExtendedSession; token: any }) {
+    async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

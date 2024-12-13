@@ -85,14 +85,6 @@ export function Chat({ id, initialMessages, selectedModelId, initialChunk }: Cha
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 
-  useEffect(() => {
-    if (!currentChunk) {
-      console.log("No currentChunk set yet.");
-      return;
-    }
-    console.log("Current chunk after initial set:", currentChunk);
-  }, [currentChunk]);
-
   const fetchNextChunk = useCallback(async (current: ContentChunk, response: 'moveon' | 'tellmemore') => {
     console.log('Fetching next chunk, current:', current, 'response:', response);
     try {

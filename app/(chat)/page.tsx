@@ -18,6 +18,8 @@ export default async function Page() {
   // Fetch the initial content chunk
   const initialContentChunk = await getInitialContentChunk();
 
+  console.log("Initial content chunk in page.tsx:", initialContentChunk);
+
   // Convert the content chunk to a message format
   const initialMessages = initialContentChunk
     ? [

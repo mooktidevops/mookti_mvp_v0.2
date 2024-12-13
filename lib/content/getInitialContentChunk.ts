@@ -10,12 +10,13 @@ export async function getInitialContentChunk(): Promise<ContentChunk | null> {
     throw new Error("POSTGRES_URL is not defined");
   }
 
+  console.log("getInitialContentChunk called");
   const connection = postgres(process.env.POSTGRES_URL);
   const db = drizzle(connection);
 
   try {
     // Replace with the actual UUID of a known module in your DB
-    const targetModuleId = '00000000-0000-0000-0000-000000000000';
+    const targetModuleId = 'e4c86fd7-ab44-4465-af3b-85230a69ca66';
 
     const result = await db.select().from(contentChunks)
       .where(and(
@@ -25,6 +26,8 @@ export async function getInitialContentChunk(): Promise<ContentChunk | null> {
       .limit(1);
 
     await connection.end();
+
+    console.log("Returning initial chunk:", result);
 
     if (result.length > 0) {
       return result[0] as ContentChunk;

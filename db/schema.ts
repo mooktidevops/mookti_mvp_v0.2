@@ -13,8 +13,6 @@ import {
   uniqueIndex
 } from 'drizzle-orm/pg-core';
 
-// import { ContentChunk } from '@/lib/types/contentChunk';
-
 export const learningPaths = pgTable('learning_paths', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: text('title').notNull(),
@@ -67,7 +65,9 @@ export const contentChunks = pgTable('content_chunks', {
   title: text('title'),
   description: text('description'),
   type: text('type', {
-    enum: ['lesson', 'metalesson', 'introduction', 'conclusion', 'example', 'application', 'image', 'video']
+    enum: [
+      'lesson', 'metalesson', 'introduction', 'conclusion', 'example', 'application', 'image', 'video'
+    ]
   }).notNull(),
   nextAction: text('next_action', {
     enum: ['getNext', 'checkIn', 'assessment', 'studio', 'nextModule']
@@ -82,6 +82,8 @@ export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
+  // Add a role column for the user's role, default to 'user'
+  role: text('role').notNull().default('user'),
 });
 
 export type User = InferSelectModel<typeof user>;
