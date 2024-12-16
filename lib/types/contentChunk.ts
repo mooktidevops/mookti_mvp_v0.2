@@ -1,11 +1,33 @@
+// lib/types/contentChunk.ts
+
+export enum ContentChunkType {
+  lesson = 'lesson',
+  metalesson = 'metalesson',
+  introduction = 'introduction',
+  conclusion = 'conclusion',
+  example = 'example',
+  application = 'application',
+  image = 'image',
+  video = 'video',
+  assessment = 'assessment'
+}
+
+export enum ContentChunkNextAction {
+  getNext = 'getNext',
+  checkIn = 'checkIn',
+  assessment = 'assessment',
+  studio = 'studio',
+  nextModule = 'nextModule'
+}
+
 export interface ContentChunk {
-  id: string;         // UUID
-  moduleId: string;   // Matches Module.id
-  order: number;      // Position of chunk within the module
+  id: string;
+  moduleId: string;
+  sequence_order: number;
   title?: string;
   description?: string;
-  type: 'lesson' | 'metalesson' | 'introduction' | 'conclusion' | 'example' | 'application' | 'image' | 'video';
-  nextAction: 'getNext' | 'checkIn' | 'assessment' | 'studio' | 'nextModule';
+  type: ContentChunkType;
+  nextAction: ContentChunkNextAction;
   content: string;
-  mediaAssetId?: string;  // optional, if chunk references a media asset
+  mediaAssetId?: string;
 }
