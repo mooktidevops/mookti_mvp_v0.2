@@ -1,15 +1,18 @@
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { learningPaths } from '@/db/schema';
 
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  // Await params if it's a promise
-  const { id } = await params;
+  const { id } = await context.params;
   console.log(`GET /admin/api/learning-paths/${id} - Fetching learning path`);
   try {
     const [path] = await db
@@ -28,20 +31,19 @@ export async function GET(
   }
 }
 
-// Also update PUT and DELETE handlers similarly
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id } = await params;
+  const { id } = await context.params;
   const { title, description, slug } = await request.json();
   // ... rest of the code
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id } = await params;
+  const { id } = await context.params;
   // ... rest of the code
 }

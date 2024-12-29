@@ -1,18 +1,20 @@
-// app/admin/api/modules/[id]/route.ts
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { modules, contentChunks } from '@/db/schema';
 
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function GET(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id } = await params;
+  const { id } = await context.params;
   
   try {
-    // First get the module
     const [mod] = await db
       .select()
       .from(modules)
@@ -22,14 +24,12 @@ export async function GET(
       return NextResponse.json({ error: 'Not Found' }, { status: 404 });
     }
 
-    // Then get its chunks
     const chunks = await db
       .select()
       .from(contentChunks)
       .where(eq(contentChunks.moduleId, id))
       .orderBy(contentChunks.order);
 
-    // Combine and return the data
     return NextResponse.json({
       ...mod,
       chunks
@@ -41,10 +41,10 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id } = await params;
+  const { id } = await context.params;
   try {
     const { title, description, slug } = await request.json();
     const [updatedModule] = await db
@@ -64,10 +64,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id } = await params;
+  const { id } = await context.params;
   try {
     const [deleted] = await db
       .delete(modules)

@@ -1,19 +1,21 @@
-// app/admin/api/modules/[id]/chunks/reorder/route.ts
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
 
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id: moduleId } = await params;
+  const { id: moduleId } = await context.params;
   const { chunks: chunkIds } = await request.json();
 
   try {
-    // Update each chunk's order based on its position in the array
     const updates = chunkIds.map((chunkId: string, index: number) =>
       db
         .update(contentChunks)
@@ -23,7 +25,6 @@ export async function PATCH(
 
     await Promise.all(updates);
 
-    // Fetch and return the updated chunks
     const updatedChunks = await db
       .select()
       .from(contentChunks)
