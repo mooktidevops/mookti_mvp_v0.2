@@ -7,10 +7,6 @@ import {
 } from 'ai';
 import { z } from 'zod';
 
-import { customModel } from '@/ai/ai';
-import { models } from '@/ai/ai/models';
-import { blocksPrompt, regularPrompt, systemPrompt } from '@/ai/ai/prompts';
-import { auth } from '@/lib/auth';
 import {
   deleteChatById,
   getChatById,
@@ -21,6 +17,10 @@ import {
   saveSuggestions,
 } from '@/db/queries';
 import { Suggestion } from '@/db/schema';
+import { customModel } from '@/helpers/ai/index';
+import { models } from '@/helpers/ai/models';
+import { blocksPrompt, regularPrompt, systemPrompt } from '@/helpers/ai/prompts';
+import { auth } from '@/lib/auth';
 import {
   generateUUID,
   getMostRecentUserMessage,
