@@ -46,7 +46,7 @@ export async function PUT(
       .update(contentChunks)
       .set({
         moduleId,
-        order: typeof order === 'number' ? order : undefined,
+        sequence_order: typeof order === 'number' ? order : undefined,
         title: title || null,
         description: description || null,
         type,

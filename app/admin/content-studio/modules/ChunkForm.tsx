@@ -26,7 +26,7 @@ type Props = {
   defaultValues?: {
     type: string;
     moduleId: string;
-    order: number;
+    sequence_order: number;
   };
 };
 

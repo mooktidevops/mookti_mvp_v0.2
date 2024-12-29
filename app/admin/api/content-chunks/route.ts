@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     const nextOrder =
       existingChunks.length > 0
-        ? Math.max(...existingChunks.map((c) => c.order)) + 1
+        ? Math.max(...existingChunks.map((c) => c.sequence_order)) + 1
         : 1;
 
     const [newChunk] = await db
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       .values({
         id: newId,
         moduleId,
-        order: nextOrder,
+        sequence_order: nextOrder,
         title: title || null,
         description: description || null,
         content,
