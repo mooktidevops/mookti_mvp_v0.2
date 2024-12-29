@@ -1,15 +1,19 @@
 // app/admin/api/learning-paths/[id]/reorder-modules/route.ts
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { learningPathModules } from '@/db/schema';
 
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id: learningPathId } = await params;
+  const { id: learningPathId } = await context.params;
   const { modules: moduleIds } = await request.json();
 
   try {
