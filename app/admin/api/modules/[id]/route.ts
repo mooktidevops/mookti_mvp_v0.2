@@ -27,7 +27,7 @@ export async function GET(
     const chunks = await db
       .select()
       .from(contentChunks)
-      .where(eq(contentChunks.moduleId, id))
+      .where(eq(contentChunks.module_id, id))
       .orderBy(contentChunks.sequence_order);
 
     return NextResponse.json({

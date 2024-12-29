@@ -21,7 +21,7 @@ export async function getNextContentChunk(currentChunk: ContentChunk): Promise<C
       const result = await db.select()
         .from(contentChunks)
         .where(and(
-          eq(contentChunks.moduleId, currentChunk.moduleId),
+          eq(contentChunks.module_id, currentChunk.module_id),
           gt(contentChunks.sequence_order, currentChunk.sequence_order)
         ))
         .orderBy(contentChunks.sequence_order)

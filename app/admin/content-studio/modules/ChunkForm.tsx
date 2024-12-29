@@ -18,19 +18,19 @@ import { getChunkTypeOptions, getNextActionOptions } from './ChunkForm.utils';
 
 
 type Props = {
-  moduleId: string;
+  module_id: string;
   chunk?: any;
   onClose: () => void;
   onSuccess: (c: any) => void;
   disabled?: boolean;
   defaultValues?: {
     type: string;
-    moduleId: string;
+    module_id: string;
     sequence_order: number;
   };
 };
 
-export function ChunkForm({ moduleId, chunk, onClose, onSuccess }: Props) {
+export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
   const { toast } = useToast();
   const [title, setTitle] = useState(chunk?.title || '');
   const [description, setDescription] = useState(chunk?.description || '');
@@ -68,7 +68,7 @@ export function ChunkForm({ moduleId, chunk, onClose, onSuccess }: Props) {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          moduleId,
+          module_id,
           title: title.trim(),
           description: description.trim(),
           type,

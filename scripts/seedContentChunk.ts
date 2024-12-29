@@ -18,8 +18,8 @@ const seedContentChunk = async () => {
 
   try {
     const result = await db.insert(contentChunks).values({
-      moduleId: '00000000-0000-0000-0000-000000000000', // Replace with a valid module ID
-      order: 1,
+      module_id: '00000000-0000-0000-0000-000000000000', // Replace with a valid module ID
+      sequence_order: 1,
       title: "Welcome to Collaborative Work Environments",
       description: "Introduction to working in teams",
       type: "introduction",

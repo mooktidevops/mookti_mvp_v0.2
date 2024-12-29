@@ -33,11 +33,11 @@ export async function PUT(
   const { id } = await context.params;
   try {
     const payload = await request.json();
-    const { moduleId, order, title, description, type, nextAction, content, mediaAssetId } = payload;
+    const { module_id, order, title, description, type, nextAction, content, mediaAssetId } = payload;
 
-    if (!moduleId || !type || !content) {
+    if (!module_id || !type || !content) {
       return NextResponse.json(
-        { error: 'Missing required fields: moduleId, type, content' },
+        { error: 'Missing required fields: module_id, type, content' },
         { status: 400 }
       );
     }
@@ -45,7 +45,7 @@ export async function PUT(
     const [updatedChunk] = await db
       .update(contentChunks)
       .set({
-        moduleId,
+        module_id,
         sequence_order: typeof order === 'number' ? order : undefined,
         title: title || null,
         description: description || null,

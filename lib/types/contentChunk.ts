@@ -22,7 +22,7 @@ export enum ContentChunkNextAction {
 
 export interface ContentChunk {
   id: string;
-  moduleId: string;
+  module_id: string;
   sequence_order: number;
   title?: string;
   description?: string;

@@ -12,7 +12,7 @@ export async function PATCH(
   request: NextRequest,
   context: RouteContext
 ) {
-  const { id: moduleId } = await context.params;
+  const { id: module_id } = await context.params;
   const { chunks: chunkIds } = await request.json();
 
   try {
@@ -28,7 +28,7 @@ export async function PATCH(
     const updatedChunks = await db
       .select()
       .from(contentChunks)
-      .where(eq(contentChunks.moduleId, moduleId))
+      .where(eq(contentChunks.module_id, module_id))
       .orderBy(contentChunks.sequence_order);
 
     return NextResponse.json(updatedChunks);

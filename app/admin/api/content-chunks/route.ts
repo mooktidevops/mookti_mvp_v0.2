@@ -8,11 +8,11 @@ import { contentChunks } from '@/db/schema';
 
 export async function POST(request: Request) {
   try {
-    const { moduleId, type, content, title, description, mediaAssetId } = await request.json();
+    const { module_id, type, content, title, description, mediaAssetId } = await request.json();
 
-    if (!moduleId || !type || !content) {
+    if (!module_id || !type || !content) {
       return NextResponse.json(
-        { error: 'Missing required fields: moduleId, type, content' },
+        { error: 'Missing required fields: module_id, type, content' },
         { status: 400 }
       );
     }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const existingChunks = await db
       .select()
       .from(contentChunks)
-      .where(eq(contentChunks.moduleId, moduleId));
+      .where(eq(contentChunks.module_id, module_id));
 
     const nextOrder =
       existingChunks.length > 0
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       .insert(contentChunks)
       .values({
         id: newId,
-        moduleId,
+        module_id,
         sequence_order: nextOrder,
         title: title || null,
         description: description || null,

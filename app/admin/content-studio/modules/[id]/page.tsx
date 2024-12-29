@@ -597,7 +597,7 @@ export default function ModuleDetailPage() {
 
       {showChunkForm && (
         <ChunkForm
-          moduleId={module.id}
+        module_id={module.id}
           onClose={() => {
             if (!operationsStatus.form && !isOperationInProgress) {
               console.log('[Render] Closing chunk form');
@@ -610,7 +610,7 @@ export default function ModuleDetailPage() {
           disabled={operationsStatus.form || isOperationInProgress}
           defaultValues={{
             type: 'lesson',
-            moduleId: module.id,
+            module_id: module.id,
             sequence_order: (chunks.length || 0) + 1
           }}
         />
@@ -618,7 +618,7 @@ export default function ModuleDetailPage() {
 
       {editingChunk && (
         <ChunkForm
-          moduleId={module.id}
+        module_id={module.id}
           chunk={editingChunk}
           onClose={() => {
             if (!operationsStatus.form && !isOperationInProgress) {
