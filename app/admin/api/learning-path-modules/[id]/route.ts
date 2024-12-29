@@ -1,16 +1,20 @@
 // app/admin/api/learning-path-modules/[id]/route.ts
 import { and, eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { learningPathModules } from '@/db/schema';
 
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const { id: moduleId } = await params;
-  const { searchParams } = new URL(request.url);
+  const { id: moduleId } = await context.params;
+  const { searchParams } = request.nextUrl; // Using NextRequest's nextUrl property
   const learningPathId = searchParams.get('learningPathId');
 
   if (!learningPathId) {
