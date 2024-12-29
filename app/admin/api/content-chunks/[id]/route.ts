@@ -1,15 +1,21 @@
 import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
 
+
+interface ChunkRouteParams {
+  id: string;
+}
+
 export async function GET(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest, 
+  context: { params: { id: string } }
 ) {
+  const {id} = context.params;
   try {
-    const [chunk] = await db.select().from(contentChunks).where(eq(contentChunks.id, params.id));
+    const [chunk] = await db.select().from(contentChunks).where(eq(contentChunks.id, id));
     if (!chunk) {
       return NextResponse.json({ error: 'Not Found' }, { status: 404 });
     }
@@ -21,9 +27,10 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest, 
+  context: { params: { id: string } }
 ) {
+  const {id} = context.params;
   try {
     const payload = await request.json();
     const { moduleId, order, title, description, type, nextAction, content, mediaAssetId } = payload;
@@ -49,7 +56,7 @@ export async function PUT(
         content,
         mediaAssetId: mediaAssetId || null,
       })
-      .where(eq(contentChunks.id, params.id))
+      .where(eq(contentChunks.id, id))
       .returning();
 
     if (!updatedChunk) {
@@ -64,13 +71,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request, 
-  { params }: { params: { id: string } }
+  request: NextRequest, 
+  context: { params: { id: string } }
 ) {
+  const {id} = context.params;
   try {
     const [deletedChunk] = await db
       .delete(contentChunks)
-      .where(eq(contentChunks.id, params.id))
+      .where(eq(contentChunks.id, id))
       .returning();
 
     if (!deletedChunk) {
