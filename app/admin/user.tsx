@@ -19,7 +19,7 @@ export async function User() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
+        {/* <Button
           variant="outline"
           size="icon"
           className="overflow-hidden rounded-full"
@@ -31,7 +31,7 @@ export async function User() {
             alt="Avatar"
             className="overflow-hidden rounded-full"
           />
-        </Button>
+        </Button> */}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
