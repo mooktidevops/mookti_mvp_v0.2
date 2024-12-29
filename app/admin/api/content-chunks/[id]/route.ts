@@ -4,11 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
 
+// Define the params type according to Next.js 15 docs
+type RouteContext = {
+  params: Promise<{ id: string }>
+};
+
 export async function GET(
-  request: NextRequest, 
-  { params }: {params: Promise<{ id: string}> }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const id = (await params).id;
+  const { id } = await context.params;
   try {
     const [chunk] = await db.select().from(contentChunks).where(eq(contentChunks.id, id));
     if (!chunk) {
@@ -22,15 +27,14 @@ export async function GET(
 }
 
 export async function PUT(
-  request: NextRequest, 
-  { params }: {params: Promise<{ id: string}> }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const id = (await params).id;
+  const { id } = await context.params;
   try {
     const payload = await request.json();
     const { moduleId, order, title, description, type, nextAction, content, mediaAssetId } = payload;
 
-    // Validate required fields
     if (!moduleId || !type || !content) {
       return NextResponse.json(
         { error: 'Missing required fields: moduleId, type, content' },
@@ -38,7 +42,6 @@ export async function PUT(
       );
     }
 
-    // Update the chunk
     const [updatedChunk] = await db
       .update(contentChunks)
       .set({
@@ -66,10 +69,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest, 
-  { params }: {params: Promise<{ id: string}> }
+  request: NextRequest,
+  context: RouteContext
 ) {
-  const id = (await params).id;
+  const { id } = await context.params;
   try {
     const [deletedChunk] = await db
       .delete(contentChunks)
