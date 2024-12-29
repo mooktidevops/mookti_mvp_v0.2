@@ -22,9 +22,9 @@ export async function getNextContentChunk(currentChunk: ContentChunk): Promise<C
         .from(contentChunks)
         .where(and(
           eq(contentChunks.moduleId, currentChunk.moduleId),
-          gt(contentChunks.order, currentChunk.order)
+          gt(contentChunks.sequence_order, currentChunk.sequence_order)
         ))
-        .orderBy(contentChunks.order)
+        .orderBy(contentChunks.sequence_order)
         .limit(1);
 
       if (result.length > 0) {
