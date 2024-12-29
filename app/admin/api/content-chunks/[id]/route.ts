@@ -5,15 +5,17 @@ import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
 
 
-interface ChunkRouteParams {
-  id: string;
-}
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
 export async function GET(
   request: NextRequest, 
-  context: { params: { id: string } }
+  { params }: Props
 ) {
-  const {id} = context.params;
+  const {id} = params;
   try {
     const [chunk] = await db.select().from(contentChunks).where(eq(contentChunks.id, id));
     if (!chunk) {
@@ -28,9 +30,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest, 
-  context: { params: { id: string } }
+  { params }: Props
 ) {
-  const {id} = context.params;
+  const {id} = params;
   try {
     const payload = await request.json();
     const { moduleId, order, title, description, type, nextAction, content, mediaAssetId } = payload;
@@ -72,9 +74,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest, 
-  context: { params: { id: string } }
+  { params }: Props
 ) {
-  const {id} = context.params;
+  const {id} = params;
   try {
     const [deletedChunk] = await db
       .delete(contentChunks)
