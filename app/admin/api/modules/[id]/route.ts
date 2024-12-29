@@ -28,7 +28,7 @@ export async function GET(
       .select()
       .from(contentChunks)
       .where(eq(contentChunks.moduleId, id))
-      .orderBy(contentChunks.order);
+      .orderBy(contentChunks.sequence_order);
 
     return NextResponse.json({
       ...mod,

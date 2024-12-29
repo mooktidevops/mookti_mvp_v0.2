@@ -19,7 +19,7 @@ export async function PATCH(
     const updates = chunkIds.map((chunkId: string, index: number) =>
       db
         .update(contentChunks)
-        .set({ order: index + 1 })
+        .set({ sequence_order: index + 1 })
         .where(eq(contentChunks.id, chunkId))
     );
 
@@ -29,7 +29,7 @@ export async function PATCH(
       .select()
       .from(contentChunks)
       .where(eq(contentChunks.moduleId, moduleId))
-      .orderBy(contentChunks.order);
+      .orderBy(contentChunks.sequence_order);
 
     return NextResponse.json(updatedChunks);
   } catch (error) {

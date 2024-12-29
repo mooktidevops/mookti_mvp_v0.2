@@ -21,7 +21,7 @@ export async function getInitialContentChunk(): Promise<ContentChunk | null> {
     const result = await db.select().from(contentChunks)
       .where(and(
         eq(contentChunks.moduleId, targetModuleId),
-        eq(contentChunks.order, 1)
+        eq(contentChunks.sequence_order, 1)
       ))
       .limit(1);
 

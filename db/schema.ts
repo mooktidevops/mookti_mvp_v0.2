@@ -61,7 +61,7 @@ export const mediaAssets = pgTable('media_assets', {
 export const contentChunks = pgTable('content_chunks', {
   id: uuid('id').primaryKey().defaultRandom(),
   moduleId: uuid('module_id').notNull().references(() => modules.id),
-  order: integer('sequence_order').notNull(),
+  sequence_order: integer('sequence_order').notNull(),
   title: text('title'),
   description: text('description'),
   type: text('type', {
