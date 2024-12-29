@@ -20,8 +20,13 @@ export const authConfig = {
         return Response.redirect(new URL('/', nextUrl as unknown as URL));
       }
 
-      if (isOnRegister || isOnLogin) {
-        return true; // Always allow access to register and login pages
+      if (isOnLogin) {
+        return true; // Always allow access to login page
+      }
+
+      if (isOnRegister) {
+        return false; // Prevents unregistered users from accessing register page on Vercel deployment before app launch
+        // SET TO TRUE ON APP LAUNCH
       }
 
       if (isOnChat) {
