@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -65,7 +66,7 @@ export default function MediaLibraryPage() {
         {media.map(m => (
           <Card key={m.id} className="p-2">
             {m.type === 'image' ? (
-              <img src={m.url} alt={m.altText || 'Media asset'} className="w-full h-auto" />
+              <Image src={m.url} alt={m.altText || 'Media asset'} layout="responsive" width={500} height={300} className="w-full h-auto" />
             ) : (
               <video src={m.url} controls className="w-full h-auto" />
             )}

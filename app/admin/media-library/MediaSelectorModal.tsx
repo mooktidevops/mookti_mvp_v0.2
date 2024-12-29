@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 import { Modal } from '@/components/custom/modal';
@@ -30,7 +31,7 @@ export function MediaSelectorModal({ onClose, onSelect }: Props) {
               onSelect(m.id);
               onClose();
             }}>
-            {m.type === 'image' ? <img src={m.url} alt="" className="h-10 w-10 object-cover" /> : <span>Video</span>}
+            {m.type === 'image' ? <Image src={m.url} alt="" width={40} height={40} className="object-cover" /> : <span>Video</span>}
             <span>{m.altText || m.url}</span>
           </div>
         ))}

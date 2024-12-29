@@ -61,25 +61,25 @@ function DesktopNav() {
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
         <Link
           href="#"
-          className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+          className="group flex size-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:size-8 md:text-base"
         >
-          <VercelLogo className="h-3 w-3 transition-all group-hover:scale-110" />
+          <VercelLogo className="size-3 transition-all group-hover:scale-110" />
           <span className="sr-only">Acme Inc</span>
         </Link>
 
         {/* Admin Dashboard */}
         <NavItem href="/admin" label="Admin Dashboard">
-          <Home className="h-5 w-5" />
+          <Home className="size-5" />
         </NavItem>
 
         {/* Content Studio */}
         <NavItem href="/admin/content-studio" label="Content Studio">
-          <NotebookPen className="h-5 w-5" />
+          <NotebookPen className="size-5" />
         </NavItem>
 
         {/* Media Library */}
         <NavItem href="/admin/media-library" label="Media Library">
-          <ImageIcon className="h-5 w-5" />
+          <ImageIcon className="size-5" />
         </NavItem>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
@@ -87,9 +87,9 @@ function DesktopNav() {
           <TooltipTrigger asChild>
             <Link
               href="#"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
             >
-              <Settings className="h-5 w-5" />
+              <Settings className="size-5" />
               <span className="sr-only">Settings</span>
             </Link>
           </TooltipTrigger>
@@ -105,7 +105,7 @@ function MobileNav() {
     <Sheet>
       <SheetTrigger asChild>
         <Button size="icon" variant="outline" className="sm:hidden">
-          <PanelLeft className="h-5 w-5" />
+          <PanelLeft className="size-5" />
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
@@ -113,9 +113,9 @@ function MobileNav() {
         <nav className="grid gap-6 text-lg font-medium">
           <Link
             href="#"
-            className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+            className="group flex size-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
           >
-            <VercelLogo className="h-3 w-3 transition-all group-hover:scale-110" />
+            <VercelLogo className="size-3 transition-all group-hover:scale-110" />
             <span className="sr-only">Acme Inc</span>
           </Link>
 
@@ -124,7 +124,7 @@ function MobileNav() {
             href="/admin"
             className="flex items-center gap-4 px-2.5 text-foreground"
           >
-            <Home className="h-5 w-5" />
+            <Home className="size-5" />
             Admin Dashboard
           </Link>
 
@@ -133,7 +133,7 @@ function MobileNav() {
             href="/admin/content-studio"
             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           >
-            <NotebookPen className="h-5 w-5" />
+            <NotebookPen className="size-5" />
             Content Studio
           </Link>
 
@@ -142,7 +142,7 @@ function MobileNav() {
             href="/admin/media-library"
             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           >
-            <ImageIcon className="h-5 w-5" />
+            <ImageIcon className="size-5" />
             Media Library
           </Link>
         </nav>

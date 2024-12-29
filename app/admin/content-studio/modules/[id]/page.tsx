@@ -449,7 +449,7 @@ export default function ModuleDetailPage() {
     console.log('[Render] isLoading is true, rendering loader');
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="size-8 animate-spin" />
       </div>
     );
   }
@@ -531,7 +531,7 @@ export default function ModuleDetailPage() {
         >
           {isOperationInProgress ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 size-4 animate-spin" />
               Processing...
             </>
           ) : (
