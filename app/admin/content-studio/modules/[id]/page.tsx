@@ -194,7 +194,7 @@ export default function ModuleDetailPage() {
 
       const updatedChunks = [...moduleData.chunks, createdChunk].map((chunk, index) => ({
         ...chunk,
-        order: index + 1
+        sequence_order: index + 1
       }));
 
       setModuleData({ 
@@ -398,7 +398,7 @@ export default function ModuleDetailPage() {
 
           const reorderedChunks = updatedChunks.map((c, idx) => ({
             ...c,
-            order: idx + 1
+            sequence_order: idx + 1
           }));
 
           setModuleData({
@@ -611,7 +611,7 @@ export default function ModuleDetailPage() {
           defaultValues={{
             type: 'lesson',
             moduleId: module.id,
-            order: (chunks.length || 0) + 1
+            sequence_order: (chunks.length || 0) + 1
           }}
         />
       )}
