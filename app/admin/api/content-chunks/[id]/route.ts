@@ -4,18 +4,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
 
-
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   request: NextRequest, 
-  { params }: Props
+  props: { params: { id: string } }
 ) {
-  const {id} = params;
+  const {id} = props.params;
   try {
     const [chunk] = await db.select().from(contentChunks).where(eq(contentChunks.id, id));
     if (!chunk) {
@@ -30,9 +23,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest, 
-  { params }: Props
+  props: { params: { id: string } }
 ) {
-  const {id} = params;
+  const {id} = props.params;
   try {
     const payload = await request.json();
     const { moduleId, order, title, description, type, nextAction, content, mediaAssetId } = payload;
@@ -74,9 +67,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest, 
-  { params }: Props
+  props: { params: { id: string } }
 ) {
-  const {id} = params;
+  const {id} = props.params;
   try {
     const [deletedChunk] = await db
       .delete(contentChunks)
