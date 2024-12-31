@@ -1,9 +1,11 @@
-import * as React from "react";
+
 import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import MessageLoading from "../../../src/components/ui/chat/message-loading";
-import { Button, ButtonProps } from "../button";
+
+import MessageLoading from "./message-loading";
+import { Button, ButtonProps } from "../../ui/button";
 
 // ChatBubble
 const chatBubbleVariant = cva(
@@ -52,24 +54,6 @@ const ChatBubble = React.forwardRef<HTMLDivElement, ChatBubbleProps>(
   ),
 );
 ChatBubble.displayName = "ChatBubble";
-
-// ChatBubbleAvatar
-interface ChatBubbleAvatarProps {
-  src?: string;
-  fallback?: string;
-  className?: string;
-}
-
-const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
-  src,
-  fallback,
-  className,
-}) => (
-  <Avatar className={className}>
-    <AvatarImage src={src} alt="Avatar" />
-    <AvatarFallback>{fallback}</AvatarFallback>
-  </Avatar>
-);
 
 // ChatBubbleMessage
 const chatBubbleMessageVariants = cva("p-4", {
@@ -192,7 +176,6 @@ ChatBubbleActionWrapper.displayName = "ChatBubbleActionWrapper";
 
 export {
   ChatBubble,
-  ChatBubbleAvatar,
   ChatBubbleMessage,
   ChatBubbleTimestamp,
   chatBubbleVariant,
