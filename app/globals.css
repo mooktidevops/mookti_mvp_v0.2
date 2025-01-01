@@ -9,6 +9,30 @@
   }
 }
 
+/* Custom scrollbar styles - outside of any layer for higher specificity */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+/* Target the actual scrollable container */
+.scrollbar-thin.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+}
+
+.scrollbar-thin.overflow-y-auto:hover::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--secondary));
+}
+
 /* Use the simpler color system from the template */
 @layer base {
   :root {
@@ -41,6 +65,11 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 222.2 84% 4.9%;
   }
 
   .dark {
@@ -71,6 +100,11 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    --sidebar: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -97,6 +131,58 @@
     font-weight: 100 900;
     src: url(/fonts/geist-mono.woff2) format('woff2');
   }
+}
+
+/* Prose styles for markdown content */
+.prose {
+  @apply max-w-none;
+}
+
+.prose pre {
+  @apply bg-muted/50 rounded-lg p-4;
+}
+
+.prose code {
+  @apply bg-muted/50 rounded px-1.5 py-0.5;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  @apply scroll-m-20;
+}
+
+.prose h1 {
+  @apply text-4xl font-bold;
+}
+
+.prose h2 {
+  @apply text-3xl font-semibold;
+}
+
+.prose h3 {
+  @apply text-2xl font-semibold;
+}
+
+.prose h4 {
+  @apply text-xl font-semibold;
+}
+
+.prose p {
+  @apply leading-7 [&:not(:first-child)]:mt-6;
+}
+
+.prose ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+
+.prose ol {
+  @apply my-6 ml-6 list-decimal [&>li]:mt-2;
+}
+
+.prose blockquote {
+  @apply mt-6 border-l-2 pl-6 italic;
 }
 
 /* Skeleton and other utilities from original code */

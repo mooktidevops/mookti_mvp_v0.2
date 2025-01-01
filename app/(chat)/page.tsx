@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 
-import { Chat } from '@/components/custom/chat';
+import { EnhancedChat } from '@/components/custom/enhanced-chat';
 import { DEFAULT_MODEL_NAME, models } from '@/helpers/ai/models';
-import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk'; 
+import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk';
 import { generateUUID } from '@/lib/utils';
 
 export default async function Page() {
@@ -32,12 +32,12 @@ export default async function Page() {
     : [];
 
   return (
-    <Chat
+    <EnhancedChat
       key={id}
       id={id}
       initialMessages={initialMessages}
       selectedModelId={selectedModelId}
-      initialChunk={initialContentChunk} 
+      initialChunk={initialContentChunk}
     />
   );
 }
