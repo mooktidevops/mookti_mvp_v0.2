@@ -9,7 +9,7 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
     <div
       className={cn(
         "flex flex-col w-full h-full p-4 gap-6",
-        "overflow-y-auto scrollbar-thin",
+        "overflow-auto",
         className
       )}
       ref={ref}

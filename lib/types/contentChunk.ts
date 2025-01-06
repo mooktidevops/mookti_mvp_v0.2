@@ -1,4 +1,5 @@
 // lib/types/contentChunk.ts
+import { DisplayType } from './displayType';
 
 export enum ContentChunkType {
   lesson = 'lesson',
@@ -30,4 +31,5 @@ export interface ContentChunk {
   nextAction: ContentChunkNextAction;
   content: string;
   mediaAssetId?: string;
+  display_type: DisplayType;
 }

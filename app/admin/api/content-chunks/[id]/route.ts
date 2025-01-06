@@ -33,7 +33,7 @@ export async function PUT(
   const { id } = await context.params;
   try {
     const payload = await request.json();
-    const { module_id, order, title, description, type, nextAction, content, mediaAssetId } = payload;
+    const { module_id, sequence_order, title, description, type, nextAction, content, mediaAssetId } = payload;
 
     if (!module_id || !type || !content) {
       return NextResponse.json(
@@ -46,7 +46,7 @@ export async function PUT(
       .update(contentChunks)
       .set({
         module_id,
-        sequence_order: typeof order === 'number' ? order : undefined,
+        sequence_order: typeof sequence_order === 'number' ? sequence_order : undefined,
         title: title || null,
         description: description || null,
         type,

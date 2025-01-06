@@ -74,6 +74,9 @@ export const contentChunks = pgTable('content_chunks', {
   }).notNull(),
   content: text('content').notNull(),
   mediaAssetId: uuid('media_asset_id').references(() => mediaAssets.id),
+  display_type: text('display_type', {
+    enum: ['message', 'card', 'card_carousel']
+  }).notNull().default('message'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

@@ -10,12 +10,11 @@
 }
 
 /* Custom scrollbar styles - outside of any layer for higher specificity */
-.scrollbar-thin {
+/* .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+  scrollbar-color: transparent transparent !important;
 }
 
-/* Target the actual scrollable container */
 .scrollbar-thin.overflow-y-auto::-webkit-scrollbar {
   width: 6px;
 }
@@ -31,7 +30,7 @@
 
 .scrollbar-thin.overflow-y-auto:hover::-webkit-scrollbar-thumb {
   background-color: hsl(var(--secondary));
-}
+} */
 
 /* Use the simpler color system from the template */
 @layer base {

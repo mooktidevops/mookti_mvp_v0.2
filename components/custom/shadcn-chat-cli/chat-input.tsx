@@ -80,7 +80,7 @@ const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
           "focus-visible:outline-none focus-visible:ring-ring",
           "disabled:cursor-not-allowed disabled:opacity-50",
           "transition-all duration-200",
-          "scrollbar-thin",
+          "overflow-auto",
           className
         )}
         style={{

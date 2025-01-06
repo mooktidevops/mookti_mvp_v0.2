@@ -8,11 +8,13 @@ import remarkGfm from 'remark-gfm';
 import useSWR, { useSWRConfig } from 'swr';
 
 import { Button } from '@/components/ui/button';
-import { ContentChunk } from '@/lib/types/contentChunk';
+import { ContentChunk, ContentChunkType, ContentChunkNextAction } from '@/lib/types/contentChunk';
+import { DisplayType } from '@/lib/types/displayType';
 import { Vote } from '@/lib/types/vote';
 import { generateUUID } from '@/lib/utils';
 
 import { ChatHeader } from './chat-header';
+import { ContentDisplay } from './content-display/content-display';
 import { Overview } from './overview';
 import { ChatBubble, ChatBubbleAction, ChatBubbleMessage } from './shadcn-chat-cli/chat-bubble';
 import { ChatInput } from './shadcn-chat-cli/chat-input';
@@ -187,36 +189,25 @@ export function EnhancedChat({ id, initialMessages, selectedModelId, initialChun
       <ChatMessageList ref={messagesContainerRef}>
         {messages.length === 0 && !currentChunk && <Overview />}
 
-        {messages.map((message, index) => (
-          <ChatBubble
-            key={message.id}
-            variant={message.role === 'user' ? 'sent' : 'received'}
-          >
-            <ChatBubbleMessage>
-              <div className="prose dark:prose-invert max-w-none">
-                <Markdown remarkPlugins={[remarkGfm]}>
-                  {message.content}
-                </Markdown>
-              </div>
-              {message.role === 'assistant' && (
-                <div className="flex items-center mt-1.5 gap-1">
-                  {ChatAiIcons.map((icon, iconIndex) => {
-                    const Icon = icon.icon;
-                    return (
-                      <ChatBubbleAction
-                        key={iconIndex}
-                        variant="outline"
-                        className="size-5"
-                        icon={<Icon className="size-3" />}
-                        onClick={() => handleActionClick(icon.label, index)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </ChatBubbleMessage>
-          </ChatBubble>
-        ))}
+        {messages.map((message, index) => {
+          const chunk: ContentChunk = {
+            id: message.id,
+            module_id: id,
+            sequence_order: index,
+            content: message.content,
+            type: ContentChunkType.lesson,
+            nextAction: ContentChunkNextAction.getNext,
+            display_type: DisplayType.message
+          };
+
+          return (
+            <ContentDisplay 
+              key={message.id}
+              chunk={chunk}
+              isFromUser={message.role === 'user'}
+            />
+          );
+        })}
 
         {showCheckInButtons && (
           <div className="flex justify-center gap-4 my-4">
