@@ -12,10 +12,10 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 import { ContentChunkNextAction, ContentChunkType } from '@/lib/types/contentChunk';
+import { DisplayType } from '@/lib/types/displayType';
 
-import { getChunkTypeOptions, getNextActionOptions } from './ChunkForm.utils';
-
-
+import { CardCarouselInput } from './CardCarouselInput';
+import { getChunkTypeOptions, getNextActionOptions, getDisplayTypeOptions } from './ChunkForm.utils';
 
 type Props = {
   module_id: string;
@@ -39,12 +39,16 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
   const [nextAction, setNextAction] = useState<ContentChunkNextAction>(
     chunk?.nextAction || ContentChunkNextAction.getNext
   );
+  const [displayType, setDisplayType] = useState<DisplayType>(
+    chunk?.display_type || DisplayType.message
+  );
   const [mediaAssetId, setMediaAssetId] = useState(chunk?.mediaAssetId || '');
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const chunkTypeOptions = getChunkTypeOptions();
   const nextActionOptions = getNextActionOptions();
+  const displayTypeOptions = getDisplayTypeOptions();
 
   const submit = async () => {
     if (!type || !content) {
@@ -74,6 +78,7 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
           type,
           content: content.trim(),
           nextAction,
+          display_type: displayType,
           mediaAssetId: mediaAssetId || undefined,
         }),
       });
@@ -169,11 +174,40 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
         {/* Content */}
         <div className="grid gap-2">
           <Label htmlFor="content">Content</Label>
-          <RichTextEditor
-            content={content}
-            onChange={(newContent: string) => setContent(newContent)}
-            placeholder="Enter content..."
-          />
+          {displayType === DisplayType.card_carousel ? (
+            <CardCarouselInput
+              value={content}
+              onChange={(newContent: string) => setContent(newContent)}
+            />
+          ) : (
+            <RichTextEditor
+              content={content}
+              onChange={(newContent: string) => setContent(newContent)}
+              placeholder="Enter content..."
+            />
+          )}
+        </div>
+
+        {/* Display Type */}
+        <div className="grid gap-2">
+          <Label>Display Type</Label>
+          <RadioGroup
+            value={displayType}
+            onValueChange={(value: DisplayType) => setDisplayType(value)}
+            className="grid grid-cols-2 gap-2"
+          >
+            {displayTypeOptions.map((option) => (
+              <div key={option.value}>
+                <RadioGroupItem value={option.value} id={option.value} className="peer sr-only" />
+                <Label
+                  htmlFor={option.value}
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-muted hover:text-accent-foreground peer-data-[state=checked]:border-primary"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
         </div>
 
         {/* Media (if applicable) */}

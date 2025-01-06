@@ -33,7 +33,17 @@ export async function PUT(
   const { id } = await context.params;
   try {
     const payload = await request.json();
-    const { module_id, sequence_order, title, description, type, nextAction, content, mediaAssetId } = payload;
+    const { 
+      module_id, 
+      sequence_order, 
+      title, 
+      description, 
+      type, 
+      nextAction, 
+      content, 
+      mediaAssetId,
+      display_type 
+    } = payload;
 
     if (!module_id || !type || !content) {
       return NextResponse.json(
@@ -53,6 +63,7 @@ export async function PUT(
         nextAction: nextAction || 'getNext',
         content,
         mediaAssetId: mediaAssetId || null,
+        display_type: display_type || 'message'
       })
       .where(eq(contentChunks.id, id))
       .returning();
@@ -64,7 +75,7 @@ export async function PUT(
     return NextResponse.json(updatedChunk, { status: 200 });
   } catch (error: any) {
     console.error('Error updating chunk:', error);
-    return NextResponse.json({ error: 'Failed to update chunk' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to update chunk' }, { status: 500 });
   }
 }
 

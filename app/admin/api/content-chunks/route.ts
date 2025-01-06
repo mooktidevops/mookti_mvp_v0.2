@@ -8,7 +8,16 @@ import { contentChunks } from '@/db/schema';
 
 export async function POST(request: Request) {
   try {
-    const { module_id, type, content, title, description, mediaAssetId } = await request.json();
+    const { 
+      module_id, 
+      type, 
+      content, 
+      title, 
+      description, 
+      mediaAssetId,
+      nextAction,
+      display_type 
+    } = await request.json();
 
     if (!module_id || !type || !content) {
       return NextResponse.json(
@@ -40,7 +49,8 @@ export async function POST(request: Request) {
         description: description || null,
         content,
         type,
-        nextAction: 'getNext',
+        nextAction: nextAction || 'getNext',
+        display_type: display_type || 'message',
         mediaAssetId: mediaAssetId || null,
       })
       .returning();
