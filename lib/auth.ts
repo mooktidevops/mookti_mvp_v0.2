@@ -1,17 +1,12 @@
 import { compare } from "bcrypt-ts";
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 
 import { authConfig } from "@/app/(auth)/auth.config";
 import { getUser } from "@/db/queries";
 
-export const {
-  handlers,
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const authOptions: NextAuthConfig = {
   ...authConfig,
   providers: [
     Credentials({
@@ -76,4 +71,11 @@ export const {
       return session;
     },
   },
-});
+};
+
+export const {
+  handlers,
+  auth,
+  signIn,
+  signOut,
+} = NextAuth(authOptions);

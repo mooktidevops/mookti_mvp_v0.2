@@ -179,3 +179,117 @@ export const suggestion = pgTable(
 );
 
 export type Suggestion = InferSelectModel<typeof suggestion>;
+
+export const sequences = pgTable('sequences', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  slug: text('slug').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    slugIndex: uniqueIndex('sequences_slug_key').on(table.slug),
+  };
+});
+
+export const sequenceModules = pgTable('sequence_modules', {
+  sequenceId: uuid('sequence_id').notNull().references(() => sequences.id),
+  moduleId: uuid('module_id').notNull().references(() => modules.id),
+  orderIndex: integer('order_index').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.sequenceId, table.moduleId] }),
+  };
+});
+
+export const learningPathSequences = pgTable('learning_path_sequences', {
+  learningPathId: uuid('learning_path_id').notNull().references(() => learningPaths.id),
+  sequenceId: uuid('sequence_id').notNull().references(() => sequences.id),
+  orderIndex: integer('order_index').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.learningPathId, table.sequenceId] }),
+  };
+});
+
+// User Progress Tracking Tables
+export const userLearningPathProgress = pgTable('user_learning_path_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => user.id),
+  learningPathId: uuid('learning_path_id').notNull().references(() => learningPaths.id),
+  status: text('status', { enum: ['not_started', 'in_progress', 'completed'] }).notNull().default('not_started'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  lastAccessedAt: timestamp('last_accessed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    userPathIndex: uniqueIndex('user_learning_path_idx').on(table.userId, table.learningPathId),
+  };
+});
+
+export const userSequenceProgress = pgTable('user_sequence_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => user.id),
+  sequenceId: uuid('sequence_id').notNull().references(() => sequences.id),
+  status: text('status', { enum: ['not_started', 'in_progress', 'completed'] }).notNull().default('not_started'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  lastAccessedAt: timestamp('last_accessed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    userSequenceIndex: uniqueIndex('user_sequence_idx').on(table.userId, table.sequenceId),
+  };
+});
+
+export const userModuleProgress = pgTable('user_module_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => user.id),
+  moduleId: uuid('module_id').notNull().references(() => modules.id),
+  status: text('status', { enum: ['not_started', 'in_progress', 'completed'] }).notNull().default('not_started'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  lastAccessedAt: timestamp('last_accessed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    userModuleIndex: uniqueIndex('user_module_idx').on(table.userId, table.moduleId),
+  };
+});
+
+export const userContentChunkProgress = pgTable('user_content_chunk_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => user.id),
+  contentChunkId: uuid('content_chunk_id').notNull().references(() => contentChunks.id),
+  status: text('status', { enum: ['not_started', 'in_progress', 'completed'] }).notNull().default('not_started'),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  lastAccessedAt: timestamp('last_accessed_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => {
+  return {
+    userChunkIndex: uniqueIndex('user_chunk_idx').on(table.userId, table.contentChunkId),
+  };
+});
+
+// Additional type exports for tables without inline type exports
+export type LearningPath = InferSelectModel<typeof learningPaths>;
+export type Module = InferSelectModel<typeof modules>;
+export type LearningPathModule = InferSelectModel<typeof learningPathModules>;
+export type MediaAsset = InferSelectModel<typeof mediaAssets>;
+export type ContentChunk = InferSelectModel<typeof contentChunks>;
+export type Sequence = InferSelectModel<typeof sequences>;
+export type SequenceModule = InferSelectModel<typeof sequenceModules>;
+export type LearningPathSequence = InferSelectModel<typeof learningPathSequences>;
+export type UserLearningPathProgress = InferSelectModel<typeof userLearningPathProgress>;
+export type UserSequenceProgress = InferSelectModel<typeof userSequenceProgress>;
+export type UserModuleProgress = InferSelectModel<typeof userModuleProgress>;
+export type UserContentChunkProgress = InferSelectModel<typeof userContentChunkProgress>;

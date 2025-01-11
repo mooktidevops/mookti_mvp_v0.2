@@ -1,4 +1,5 @@
-// @hidden
+'use client';
+
 export default function MessageLoading() {
   return (
     <svg

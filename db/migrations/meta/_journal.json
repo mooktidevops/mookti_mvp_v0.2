@@ -3,10 +3,17 @@
   "dialect": "pg",
   "entries": [
     {
-      "idx": 0,
+      "idx": 1,
       "version": "5",
-      "when": 1710809999999,
+      "when": 1704556320000,
       "tag": "0001_add_display_type",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704556321000,
+      "tag": "0002_add_user_progress_tracking",
       "breakpoints": true
     }
   ]

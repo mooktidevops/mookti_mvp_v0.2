@@ -24,7 +24,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "types": ["node", "jest", "@types/react", "@types/react-dom"]
   },
   "include": [
     "next-env.d.ts",

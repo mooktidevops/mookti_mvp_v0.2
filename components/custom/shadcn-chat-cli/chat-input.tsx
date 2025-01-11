@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from "react";
 
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +16,7 @@ const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const isMobile = width ? width < 768 : false;
     const maxHeight = isMobile ? '60vh' : '30vh';
 
-    const handleTextareaResize = () => {
+    const handleTextareaResize = React.useCallback(() => {
       const textarea = textareaRef.current;
       if (!textarea) return;
 
@@ -22,9 +24,12 @@ const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
       textarea.style.height = 'auto';
       
       // Calculate new height
-      const newHeight = Math.min(textarea.scrollHeight, parseInt(maxHeight) * window.innerHeight / 100);
+      const newHeight = Math.min(
+        textarea.scrollHeight,
+        (parseInt(maxHeight) * window.innerHeight) / 100
+      );
       textarea.style.height = `${newHeight}px`;
-    };
+    }, [maxHeight]);
 
     const handleScroll = (e: Event) => {
       const textarea = e.target as HTMLTextAreaElement;
@@ -57,7 +62,7 @@ const ChatInput = React.forwardRef<HTMLTextAreaElement, ChatInputProps>(
           }
         };
       }
-    }, [props.value]);
+    }, [props.value, handleTextareaResize]);
 
     return (
       <Textarea

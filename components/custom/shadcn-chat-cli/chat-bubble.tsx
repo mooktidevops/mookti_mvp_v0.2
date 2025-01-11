@@ -1,7 +1,10 @@
+'use client';
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
 import { Button, type ButtonProps } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
 import MessageLoading from './message-loading';
@@ -147,6 +150,24 @@ const ChatBubbleActionWrapper = React.forwardRef<HTMLDivElement, ChatBubbleActio
 );
 ChatBubbleActionWrapper.displayName = 'ChatBubbleActionWrapper';
 
+interface ChatBubbleAvatarProps {
+  src: string;
+  fallback: string;
+  className?: string;
+}
+
+const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
+  src,
+  fallback,
+  className,
+  ...props
+}) => (
+  <Avatar className={cn('size-8', className)} {...props}>
+    <AvatarImage src={src} />
+    <AvatarFallback>{fallback}</AvatarFallback>
+  </Avatar>
+);
+
 export {
   ChatBubble,
   ChatBubbleMessage,
@@ -155,4 +176,5 @@ export {
   chatBubbleMessageVariants,
   ChatBubbleAction,
   ChatBubbleActionWrapper,
+  ChatBubbleAvatar,
 };

@@ -1,7 +1,7 @@
 // ./components/forms/ChunkForm.tsx
 'use client';
 
-import { useState } from 'react';
+import * as React from 'react';
 
 import { MediaSelectorModal } from '@/app/admin/media-library/MediaSelectorModal';
 import { Modal } from '@/components/custom/modal';
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
-import { ContentChunkNextAction, ContentChunkType } from '@/lib/types/contentChunk';
+import { ContentChunk, ContentChunkNextAction, ContentChunkType } from '@/lib/types/contentChunk';
 import { DisplayType } from '@/lib/types/displayType';
 
 import { CardCarouselInput } from './CardCarouselInput';
@@ -19,12 +19,12 @@ import { getChunkTypeOptions, getNextActionOptions, getDisplayTypeOptions } from
 
 type Props = {
   module_id: string;
-  chunk?: any;
+  chunk?: ContentChunk;
   onClose: () => void;
-  onSuccess: (c: any) => void;
+  onSuccess: (chunk: ContentChunk) => void;
   disabled?: boolean;
   defaultValues?: {
-    type: string;
+    type: ContentChunkType;
     module_id: string;
     sequence_order: number;
   };
@@ -32,23 +32,35 @@ type Props = {
 
 export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
   const { toast } = useToast();
-  const [title, setTitle] = useState(chunk?.title || '');
-  const [description, setDescription] = useState(chunk?.description || '');
-  const [type, setType] = useState<ContentChunkType>(chunk?.type || ContentChunkType.lesson);
-  const [content, setContent] = useState(chunk?.content || '');
-  const [nextAction, setNextAction] = useState<ContentChunkNextAction>(
+  const [title, setTitle] = React.useState(chunk?.title || '');
+  const [description, setDescription] = React.useState(chunk?.description || '');
+  const [type, setType] = React.useState<ContentChunkType>(chunk?.type || ContentChunkType.lesson);
+  const [content, setContent] = React.useState(chunk?.content || '');
+  const [nextAction, setNextAction] = React.useState<ContentChunkNextAction>(
     chunk?.nextAction || ContentChunkNextAction.getNext
   );
-  const [displayType, setDisplayType] = useState<DisplayType>(
+  const [displayType, setDisplayType] = React.useState<DisplayType>(
     chunk?.display_type || DisplayType.message
   );
-  const [mediaAssetId, setMediaAssetId] = useState(chunk?.mediaAssetId || '');
-  const [showMediaModal, setShowMediaModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [mediaAssetId, setMediaAssetId] = React.useState(chunk?.mediaAssetId || '');
+  const [showMediaModal, setShowMediaModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const chunkTypeOptions = getChunkTypeOptions();
   const nextActionOptions = getNextActionOptions();
   const displayTypeOptions = getDisplayTypeOptions();
+
+  const handleTypeChange = (value: string) => {
+    setType(value as ContentChunkType);
+  };
+
+  const handleNextActionChange = (value: string) => {
+    setNextAction(value as ContentChunkNextAction);
+  };
+
+  const handleDisplayTypeChange = (value: string) => {
+    setDisplayType(value as DisplayType);
+  };
 
   const submit = async () => {
     if (!type || !content) {
@@ -108,18 +120,18 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
       <div className="grid gap-6">
         {/* Title */}
         <div className="grid gap-2">
-          <Label htmlFor="title">Title (optional)</Label>
+          <div className="text-sm font-medium">Title (optional)</div>
           <Input
             id="title"
             placeholder="Enter title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
           />
         </div>
 
         {/* Description */}
         <div className="grid gap-2">
-          <Label htmlFor="description">Description (optional)</Label>
+          <div className="text-sm font-medium">Description (optional)</div>
           <RichTextEditor
             content={description}
             onChange={(newDescription) => setDescription(newDescription)}
@@ -129,21 +141,12 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
 
         {/* Chunk Type */}
         <div className="grid gap-2">
-          <Label>Chunk Type</Label>
-          <RadioGroup
-            value={type}
-            onValueChange={(value: ContentChunkType) => setType(value)}
-            className="grid grid-cols-2 gap-2"
-          >
-            {chunkTypeOptions.map((chunkType) => (
-              <div key={chunkType.value}>
-                <RadioGroupItem value={chunkType.value} id={chunkType.value} className="peer sr-only" />
-                <Label
-                  htmlFor={chunkType.value}
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-muted hover:text-accent-foreground peer-data-[state=checked]:border-primary"
-                >
-                  {chunkType.label}
-                </Label>
+          <div className="text-sm font-medium">Chunk Type</div>
+          <RadioGroup value={type} onValueChange={handleTypeChange}>
+            {chunkTypeOptions.map((option) => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <RadioGroupItem value={option.value} />
+                <Label htmlFor={option.value}>{option.label}</Label>
               </div>
             ))}
           </RadioGroup>
@@ -151,21 +154,12 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
 
         {/* Next Action */}
         <div className="grid gap-2">
-          <Label>Next Action</Label>
-          <RadioGroup
-            value={nextAction}
-            onValueChange={(value: ContentChunkNextAction) => setNextAction(value)}
-            className="grid grid-cols-2 gap-2"
-          >
-            {nextActionOptions.map((action) => (
-              <div key={action.value}>
-                <RadioGroupItem value={action.value} id={action.value} className="peer sr-only" />
-                <Label
-                  htmlFor={action.value}
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-muted hover:text-accent-foreground peer-data-[state=checked]:border-primary"
-                >
-                  {action.label}
-                </Label>
+          <div className="text-sm font-medium">Next Action</div>
+          <RadioGroup value={nextAction} onValueChange={handleNextActionChange}>
+            {nextActionOptions.map((option) => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <RadioGroupItem value={option.value} />
+                <Label htmlFor={option.value}>{option.label}</Label>
               </div>
             ))}
           </RadioGroup>
@@ -173,7 +167,7 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
 
         {/* Content */}
         <div className="grid gap-2">
-          <Label htmlFor="content">Content</Label>
+          <div className="text-sm font-medium">Content</div>
           {displayType === DisplayType.card_carousel ? (
             <CardCarouselInput
               value={content}
@@ -190,21 +184,12 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
 
         {/* Display Type */}
         <div className="grid gap-2">
-          <Label>Display Type</Label>
-          <RadioGroup
-            value={displayType}
-            onValueChange={(value: DisplayType) => setDisplayType(value)}
-            className="grid grid-cols-2 gap-2"
-          >
+          <div className="text-sm font-medium">Display Type</div>
+          <RadioGroup value={displayType} onValueChange={handleDisplayTypeChange}>
             {displayTypeOptions.map((option) => (
-              <div key={option.value}>
-                <RadioGroupItem value={option.value} id={option.value} className="peer sr-only" />
-                <Label
-                  htmlFor={option.value}
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-muted hover:text-accent-foreground peer-data-[state=checked]:border-primary"
-                >
-                  {option.label}
-                </Label>
+              <div key={option.value} className="flex items-center space-x-2">
+                <RadioGroupItem value={option.value} />
+                <Label htmlFor={option.value}>{option.label}</Label>
               </div>
             ))}
           </RadioGroup>
@@ -213,7 +198,7 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
         {/* Media (if applicable) */}
         {(type === ContentChunkType.image || type === ContentChunkType.video) && (
           <div className="grid gap-2">
-            <Label>Media</Label>
+            <div className="text-sm font-medium">Media</div>
             <Button variant="outline" onClick={() => setShowMediaModal(true)}>
               {mediaAssetId ? 'Change Media' : 'Select Media'}
             </Button>

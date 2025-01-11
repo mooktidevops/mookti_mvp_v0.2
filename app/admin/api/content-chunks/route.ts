@@ -1,38 +1,36 @@
-import { eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm/sql';
 import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
 
 import { db } from '@/db';
-import { contentChunks } from '@/db/schema';
+import { contentChunks, type ContentChunk } from '@/db/schema';
+import { ChunkType, NextAction, DisplayType, type ApiResponse } from '@/lib/types/content';
+import { errorResponse } from '@/lib/utils/api';
 
+// Validation schema for POST request
+const createChunkSchema = z.object({
+  module_id: z.string().uuid(),
+  type: z.enum(ChunkType),
+  content: z.string(),
+  title: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  mediaAssetId: z.string().uuid().optional().nullable(),
+  nextAction: z.enum(NextAction).default('getNext'),
+  display_type: z.enum(DisplayType).default('message')
+});
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request
+): Promise<NextResponse<ApiResponse<ContentChunk>>> {
   try {
-    const { 
-      module_id, 
-      type, 
-      content, 
-      title, 
-      description, 
-      mediaAssetId,
-      nextAction,
-      display_type 
-    } = await request.json();
-
-    if (!module_id || !type || !content) {
-      return NextResponse.json(
-        { error: 'Missing required fields: module_id, type, content' },
-        { status: 400 }
-      );
-    }
-
-    const newId = uuidv4();
+    const payload = await request.json();
+    const validatedData = createChunkSchema.parse(payload);
 
     // Determine next order
     const existingChunks = await db
       .select()
       .from(contentChunks)
-      .where(eq(contentChunks.module_id, module_id));
+      .where(eq(contentChunks.module_id, validatedData.module_id));
 
     const nextOrder =
       existingChunks.length > 0
@@ -42,25 +40,20 @@ export async function POST(request: Request) {
     const [newChunk] = await db
       .insert(contentChunks)
       .values({
-        id: newId,
-        module_id,
+        module_id: validatedData.module_id,
         sequence_order: nextOrder,
-        title: title || null,
-        description: description || null,
-        content,
-        type,
-        nextAction: nextAction || 'getNext',
-        display_type: display_type || 'message',
-        mediaAssetId: mediaAssetId || null,
+        title: validatedData.title,
+        description: validatedData.description,
+        content: validatedData.content,
+        type: validatedData.type,
+        nextAction: validatedData.nextAction,
+        display_type: validatedData.display_type,
+        mediaAssetId: validatedData.mediaAssetId
       })
       .returning();
 
     return NextResponse.json(newChunk, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating chunk:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create chunk' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return errorResponse(error, 'Error creating content chunk', 'Content Chunks API');
   }
 }

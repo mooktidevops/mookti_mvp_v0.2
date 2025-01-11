@@ -1,47 +1,49 @@
 "use client";
 
-import {
-  ChatBubble,
-  ChatBubbleAction,
-  ChatBubbleMessage,
-} from "@/components/ui/chat/chat-bubble";
-import { ChatInput } from "@/components/ui/chat/chat-input";
-import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
-import { Button } from "@/components/ui/button";
+import { useChat } from 'ai/react';
+import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import {
   CopyIcon,
   CornerDownLeft,
+  Loader2,
   Mic,
   Paperclip,
   RefreshCcw,
   Send,
   Volume2,
-} from "lucide-react";
-import { useChat } from "ai/react";
-import { useEffect, useRef, useState } from "react";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import CodeDisplayBlock from "@/components/code-display-block";
+} from 'lucide-react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { useEffect, useRef, useState } from 'react';
 
-import { Avatar } from '../../components/custom/avatar';
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  ChatBubble,
+  ChatBubbleAction,
+  ChatBubbleMessage,
+  ChatBubbleAvatar,
+} from './chat-bubble';
+import { ChatInput } from './chat-input';
+import { ChatMessageList } from './chat-message-list';
+import CodeDisplayBlock from '@/components/code-display-block';
 
 const ChatAiIcons = [
   {
     icon: CopyIcon,
-    label: "Copy",
+    label: 'Copy',
   },
   {
     icon: RefreshCcw,
-    label: "Refresh",
+    label: 'Refresh',
   },
   {
     icon: Volume2,
-    label: "Volume",
+    label: 'Volume',
   },
 ];
 
-export default function Home() {
+export default function ChatPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const {
     messages,
@@ -81,7 +83,7 @@ export default function Home() {
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (isGenerating || isLoading || !input) return;
       setIsGenerating(true);
@@ -90,21 +92,21 @@ export default function Home() {
   };
 
   const handleActionClick = async (action: string, messageIndex: number) => {
-    console.log("Action clicked:", action, "Message index:", messageIndex);
-    if (action === "Refresh") {
+    console.log('Action clicked:', action, 'Message index:', messageIndex);
+    if (action === 'Refresh') {
       setIsGenerating(true);
       try {
         await reload();
       } catch (error) {
-        console.error("Error reloading:", error);
+        console.error('Error reloading:', error);
       } finally {
         setIsGenerating(false);
       }
     }
 
-    if (action === "Copy") {
+    if (action === 'Copy') {
       const message = messages[messageIndex];
-      if (message && message.role === "assistant") {
+      if (message && message.role === 'assistant') {
         navigator.clipboard.writeText(message.content);
       }
     }
@@ -118,7 +120,7 @@ export default function Home() {
           <div className="w-full bg-background shadow-sm border rounded-lg p-8 flex flex-col gap-2">
             <h1 className="font-bold">Welcome to this example app.</h1>
             <p className="text-muted-foreground text-sm">
-              This is a simple Next.JS example application created using{" "}
+              This is a simple Next.JS example application created using{' '}
               <a
                 href="https://github.com/jakobhoeg/shadcn-chat"
                 className="font-bold inline-flex flex-1 justify-center gap-1 leading-4 hover:underline"
@@ -136,8 +138,8 @@ export default function Home() {
                     fill="currentColor"
                   ></path>
                 </svg>
-              </a>{" "}
-              components. It uses{" "}
+              </a>{' '}
+              components. It uses{' '}
               <a
                 href="https://sdk.vercel.ai/"
                 className="font-bold inline-flex flex-1 justify-center gap-1 leading-4 hover:underline"
@@ -155,7 +157,7 @@ export default function Home() {
                     fill="currentColor"
                   ></path>
                 </svg>
-              </a>{" "}
+              </a>{' '}
               for the AI integration. Build chat interfaces like this at
               lightspeed with shadcn-chat.
             </p>
@@ -171,16 +173,15 @@ export default function Home() {
           messages.map((message, index) => (
             <ChatBubble
               key={index}
-              variant={message.role == "user" ? "sent" : "received"}
+              variant={message.role === 'user' ? 'sent' : 'received'}
             >
               <ChatBubbleAvatar
                 src=""
-                fallback={message.role == "user" ? "👨🏽" : "🤖"}
+                fallback={message.role === 'user' ? '👨🏽' : '🤖'}
               />
-              <ChatBubbleMessage
-              >
+              <ChatBubbleMessage>
                 {message.content
-                  .split("```")
+                  .split('```')
                   .map((part: string, index: number) => {
                     if (index % 2 === 0) {
                       return (
@@ -197,7 +198,7 @@ export default function Home() {
                     }
                   })}
 
-                {message.role === "assistant" &&
+                {message.role === 'assistant' &&
                   messages.length - 1 === index && (
                     <div className="flex items-center mt-1.5 gap-1">
                       {!isGenerating && (

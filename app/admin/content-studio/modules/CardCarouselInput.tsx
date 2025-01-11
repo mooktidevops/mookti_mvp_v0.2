@@ -92,7 +92,7 @@ export function CardCarouselInput({ value, onChange }: CardCarouselInputProps) {
                 className="absolute top-2 right-2"
                 onClick={() => removeCard(index)}
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </Button>
             )}
 
@@ -125,7 +125,7 @@ export function CardCarouselInput({ value, onChange }: CardCarouselInputProps) {
           className="w-full"
           onClick={addCard}
         >
-          <PlusCircle className="h-4 w-4 mr-2" />
+          <PlusCircle className="size-4 mr-2" />
           Add Card
         </Button>
       </div>
