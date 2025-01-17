@@ -1,5 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm/sql';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 import { db } from '@/db';
 import {
@@ -27,9 +28,6 @@ import {
 import {
   ProgressStatus,
   ChunkProgress,
-  ModuleProgress,
-  SequenceProgress,
-  LearningPathProgress,
   ProgressUpdateOptions,
   DeferredChunkUpdate,
   DeferredUpdateQueue
@@ -45,7 +43,6 @@ import {
   progressUpdateOptionsSchema
 } from './validation';
 
-// Validation schemas for input parameters
 const userIdSchema = z.string().uuid();
 const contentIdSchema = z.string().uuid();
 const contentTypeSchema = z.enum(['chunk', 'module', 'sequence', 'path']);
@@ -64,21 +61,19 @@ class ProgressUpdateQueueImpl implements DeferredUpdateQueue {
     if (this.updates.length === 0) return;
 
     try {
-      // Group updates by user and chunk for efficiency
-      const groupedUpdates = this.updates.reduce((acc, update) => {
+      const grouped = this.updates.reduce((acc, update) => {
         const key = `${update.userId}-${update.contentChunkId}`;
+        // keep the most recent if multiple updates for same chunk
         if (!acc[key] || acc[key].timestamp < update.timestamp) {
           acc[key] = update;
         }
         return acc;
       }, {} as Record<string, DeferredChunkUpdate>);
 
-      // Batch update all chunks
       await Promise.all(
-        Object.values(groupedUpdates).map(async update => {
+        Object.values(grouped).map(async update => {
           try {
-            // Validate the update before applying
-            const currentProgress = await db
+            const existingProgress = await db
               .select()
               .from(userContentChunkProgress)
               .where(
@@ -87,15 +82,17 @@ class ProgressUpdateQueueImpl implements DeferredUpdateQueue {
                   eq(userContentChunkProgress.contentChunkId, update.contentChunkId)
                 )
               )
-              .limit(1);
+              .limit(1)
+              .execute();
 
-            if (currentProgress.length > 0) {
-              const current = currentProgress[0];
-              if (!validateStatusTransition(current.status as ProgressStatus, update.status)) {
-                throw new InvalidStatusTransitionError(current.status, update.status);
+            if (existingProgress[0]) {
+              const currentStatus = existingProgress[0].status as ProgressStatus;
+              if (!validateStatusTransition(currentStatus, update.status)) {
+                throw new InvalidStatusTransitionError(currentStatus, update.status);
               }
             }
 
+            // Use .set(...) for updates
             await db
               .update(userContentChunkProgress)
               .set({
@@ -109,9 +106,9 @@ class ProgressUpdateQueueImpl implements DeferredUpdateQueue {
                   eq(userContentChunkProgress.userId, update.userId),
                   eq(userContentChunkProgress.contentChunkId, update.contentChunkId)
                 )
-              );
+              )
+              .execute();
           } catch (error) {
-            // Log error but continue with other updates
             console.error('Error processing deferred update:', error);
             throw new QueueError('update', error);
           }
@@ -135,7 +132,9 @@ export class ProgressTrackingService {
       contentIdSchema.parse(contentId);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new ValidationError(`Invalid input parameters: ${error.errors.map(e => e.message).join(', ')}`);
+        throw new ValidationError(
+          `Invalid input parameters: ${error.errors.map(e => e.message).join(', ')}`
+        );
       }
       throw error;
     }
@@ -152,67 +151,74 @@ export class ProgressTrackingService {
 
       switch (contentType) {
         case 'chunk': {
-          // First verify the content exists
-          try {
-            const contentExists = await db
-              .select()
-              .from(contentChunks)
-              .where(eq(contentChunks.id, contentId))
-              .limit(1);
+          // Check chunk existence
+          const contentRow = await db
+            .select()
+            .from(contentChunks)
+            .where(eq(contentChunks.id, contentId))
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-            if (contentExists.length === 0) {
-              throw new ContentNotFoundError('Content chunk', contentId);
-            }
+          if (!contentRow) {
+            throw new ContentNotFoundError('Content chunk', contentId);
+          }
 
-            const existing = await db
-              .select()
-              .from(userContentChunkProgress)
-              .where(
-                and(
-                  eq(userContentChunkProgress.userId, userId),
-                  eq(userContentChunkProgress.contentChunkId, contentId)
-                )
+          // Check user progress
+          const existing = await db
+            .select()
+            .from(userContentChunkProgress)
+            .where(
+              and(
+                eq(userContentChunkProgress.userId, userId),
+                eq(userContentChunkProgress.contentChunkId, contentId)
               )
-              .limit(1);
+            )
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-            if (existing.length === 0) {
-              const newRecord = {
-                userId,
-                contentChunkId: contentId,
-                status: 'not_started' as const,
-                startedAt: null,
-                completedAt: null,
-                lastAccessedAt: timestamp
-              };
+          if (!existing) {
+            // create a new record
+            const newRecord = {
+              userId,
+              contentChunkId: contentId,
+              status: 'not_started' as const,
+              startedAt: null,
+              completedAt: null,
+              lastAccessedAt: timestamp
+            };
 
-              try {
-                validateProgressRecord(chunkProgressSchema, {
-                  ...newRecord,
-                  id: 'temp' // Will be replaced by DB
-                });
-              } catch (error) {
-                throw new ValidationError(error instanceof Error ? error.message : String(error));
-              }
-
-              await db.insert(userContentChunkProgress).values(newRecord);
+            // chunkProgressSchema requires an id, so pass randomUUID
+            try {
+              validateProgressRecord(chunkProgressSchema, {
+                ...newRecord,
+                id: randomUUID()
+              });
+            } catch (error) {
+              throw new ValidationError(
+                error instanceof Error ? error.message : String(error)
+              );
             }
-          } catch (error) {
-            if (error instanceof ProgressTrackingError) {
-              throw error;
-            }
-            throw new DatabaseError('select or insert', error);
+
+            await db
+              .insert(userContentChunkProgress)
+              .values([ newRecord ]) // array form
+              .execute();
           }
           break;
         }
+
         case 'module': {
-          // First verify the module exists
-          const moduleExists = await db
+          const moduleRow = await db
             .select()
             .from(modules)
             .where(eq(modules.id, contentId))
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (moduleExists.length === 0) {
+          if (!moduleRow) {
             throw new ContentNotFoundError('Module', contentId);
           }
 
@@ -225,26 +231,33 @@ export class ProgressTrackingService {
                 eq(userModuleProgress.moduleId, contentId)
               )
             )
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (existing.length === 0) {
-            await db.insert(userModuleProgress).values({
-              userId,
-              moduleId: contentId,
-              status: 'not_started'
-            });
+          if (!existing) {
+            await db
+              .insert(userModuleProgress)
+              .values([{
+                userId,
+                moduleId: contentId,
+                status: 'not_started'
+              }])
+              .execute();
           }
           break;
         }
+
         case 'sequence': {
-          // First verify the sequence exists
-          const sequenceExists = await db
+          const sequenceRow = await db
             .select()
             .from(sequences)
             .where(eq(sequences.id, contentId))
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (sequenceExists.length === 0) {
+          if (!sequenceRow) {
             throw new ContentNotFoundError('Sequence', contentId);
           }
 
@@ -257,26 +270,33 @@ export class ProgressTrackingService {
                 eq(userSequenceProgress.sequenceId, contentId)
               )
             )
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (existing.length === 0) {
-            await db.insert(userSequenceProgress).values({
-              userId,
-              sequenceId: contentId,
-              status: 'not_started'
-            });
+          if (!existing) {
+            await db
+              .insert(userSequenceProgress)
+              .values([{
+                userId,
+                sequenceId: contentId,
+                status: 'not_started'
+              }])
+              .execute();
           }
           break;
         }
+
         case 'path': {
-          // First verify the learning path exists
-          const pathExists = await db
+          const pathRow = await db
             .select()
             .from(learningPaths)
             .where(eq(learningPaths.id, contentId))
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (pathExists.length === 0) {
+          if (!pathRow) {
             throw new ContentNotFoundError('Learning path', contentId);
           }
 
@@ -289,14 +309,19 @@ export class ProgressTrackingService {
                 eq(userLearningPathProgress.learningPathId, contentId)
               )
             )
-            .limit(1);
+            .limit(1)
+            .execute()
+            .then(rows => rows[0]);
 
-          if (existing.length === 0) {
-            await db.insert(userLearningPathProgress).values({
-              userId,
-              learningPathId: contentId,
-              status: 'not_started'
-            });
+          if (!existing) {
+            await db
+              .insert(userLearningPathProgress)
+              .values([{
+                userId,
+                learningPathId: contentId,
+                status: 'not_started'
+              }])
+              .execute();
           }
           break;
         }
@@ -316,11 +341,11 @@ export class ProgressTrackingService {
     options: ProgressUpdateOptions = {}
   ): Promise<ChunkProgress> {
     try {
-      // Ensure the progress record exists
+      // ensure record
       await this.ensureProgressRecord(userId, 'chunk', contentChunkId);
 
-      // Get current progress
-      const currentProgress = await db
+      // re-check progress
+      const current = await db
         .select()
         .from(userContentChunkProgress)
         .where(
@@ -329,27 +354,24 @@ export class ProgressTrackingService {
             eq(userContentChunkProgress.contentChunkId, contentChunkId)
           )
         )
-        .limit(1);
+        .limit(1)
+        .execute()
+        .then(rows => rows[0]);
 
-      if (currentProgress.length === 0) {
+      if (!current) {
         throw new DatabaseError('select', new Error('Progress record not found after ensuring it exists'));
       }
 
-      const current = currentProgress[0];
-      const timestamp = new Date();
-
-      // Validate status transition
       if (!validateStatusTransition(current.status as ProgressStatus, newStatus)) {
         throw new InvalidStatusTransitionError(current.status, newStatus);
       }
 
-      // Prepare update data
-      const updateData = {
+      const timestamp = new Date();
+      const updateData: Partial<ChunkProgress> = {
         status: newStatus,
         lastAccessedAt: timestamp,
         updatedAt: timestamp
-      } as any;
-
+      };
       if (newStatus === 'in_progress' && current.status === 'not_started') {
         updateData.startedAt = timestamp;
       } else if (newStatus === 'completed') {
@@ -357,19 +379,19 @@ export class ProgressTrackingService {
       }
 
       try {
-        // Update progress
         await db
           .update(userContentChunkProgress)
-          .set(updateData)
+          .set(updateData)  // use .set for updates
           .where(
             and(
               eq(userContentChunkProgress.userId, userId),
               eq(userContentChunkProgress.contentChunkId, contentChunkId)
             )
-          );
+          )
+          .execute();
 
-        // Get updated record
-        const updatedProgress = await db
+        // final re-check
+        const updated = await db
           .select()
           .from(userContentChunkProgress)
           .where(
@@ -378,13 +400,19 @@ export class ProgressTrackingService {
               eq(userContentChunkProgress.contentChunkId, contentChunkId)
             )
           )
-          .limit(1);
+          .limit(1)
+          .execute()
+          .then(rows => rows[0]);
 
-        if (updatedProgress.length === 0) {
+        if (!updated) {
           throw new DatabaseError('select', new Error('Updated progress record not found'));
         }
 
-        return updatedProgress[0] as ChunkProgress;
+        if (options.updateParents && newStatus === 'completed') {
+          await this.checkAndUpdateModuleProgress(userId, contentChunkId);
+        }
+
+        return updated as ChunkProgress;
       } catch (error) {
         if (error instanceof ProgressTrackingError) {
           throw error;
@@ -399,23 +427,21 @@ export class ProgressTrackingService {
     }
   }
 
-  private async checkAndUpdateModuleProgress(
-    userId: string,
-    chunkId: string
-  ): Promise<void> {
+  private async checkAndUpdateModuleProgress(userId: string, chunkId: string): Promise<void> {
     const chunk = await db
       .select()
       .from(contentChunks)
       .where(eq(contentChunks.id, chunkId))
-      .limit(1);
+      .limit(1)
+      .execute()
+      .then(rows => rows[0]);
 
-    if (!chunk.length) return;
+    if (!chunk) return;
 
-    const moduleId = chunk[0].module_id;
+    const moduleId = chunk.module_id;
     await this.ensureProgressRecord(userId, 'module', moduleId);
 
-    // Count completed chunks in module
-    const [result] = await db
+    const result = await db
       .select({
         completed_count: sql<number>`count(*) filter (where ${userContentChunkProgress.status} = 'completed')`,
         total_count: sql<number>`count(*)`
@@ -428,11 +454,12 @@ export class ProgressTrackingService {
           eq(userContentChunkProgress.userId, userId)
         )
       )
-      .where(eq(contentChunks.module_id, moduleId));
+      .where(eq(contentChunks.module_id, moduleId))
+      .execute()
+      .then(rows => rows[0]);
 
-    const completed_count = Number(result.completed_count) || 0;
-    const total_count = Number(result.total_count) || 0;
-
+    const completed_count = Number(result?.completed_count ?? 0);
+    const total_count = Number(result?.total_count ?? 0);
     const moduleStatus: ProgressStatus =
       completed_count === 0
         ? 'not_started'
@@ -452,27 +479,25 @@ export class ProgressTrackingService {
           eq(userModuleProgress.userId, userId),
           eq(userModuleProgress.moduleId, moduleId)
         )
-      );
+      )
+      .execute();
 
-    // If module is completed, check sequence progress
     if (moduleStatus === 'completed') {
       await this.checkAndUpdateSequenceProgress(userId, moduleId);
     }
   }
 
-  private async checkAndUpdateSequenceProgress(
-    userId: string,
-    moduleId: string
-  ): Promise<void> {
-    const sequences = await db
+  private async checkAndUpdateSequenceProgress(userId: string, moduleId: string): Promise<void> {
+    const seqRows = await db
       .select()
       .from(sequenceModules)
-      .where(eq(sequenceModules.moduleId, moduleId));
+      .where(eq(sequenceModules.moduleId, moduleId))
+      .execute();
 
-    for (const seq of sequences) {
+    for (const seq of seqRows) {
       await this.ensureProgressRecord(userId, 'sequence', seq.sequenceId);
 
-      const [result] = await db
+      const result = await db
         .select({
           completed_count: sql<number>`count(*) filter (where ${userModuleProgress.status} = 'completed')`,
           total_count: sql<number>`count(*)`
@@ -485,11 +510,12 @@ export class ProgressTrackingService {
             eq(userModuleProgress.userId, userId)
           )
         )
-        .where(eq(sequenceModules.sequenceId, seq.sequenceId));
+        .where(eq(sequenceModules.sequenceId, seq.sequenceId))
+        .execute()
+        .then(rows => rows[0]);
 
-      const completed_count = Number(result.completed_count) || 0;
-      const total_count = Number(result.total_count) || 0;
-
+      const completed_count = Number(result?.completed_count ?? 0);
+      const total_count = Number(result?.total_count ?? 0);
       const sequenceStatus: ProgressStatus =
         completed_count === 0
           ? 'not_started'
@@ -509,28 +535,26 @@ export class ProgressTrackingService {
             eq(userSequenceProgress.userId, userId),
             eq(userSequenceProgress.sequenceId, seq.sequenceId)
           )
-        );
+        )
+        .execute();
 
-      // If sequence is completed, check learning path progress
       if (sequenceStatus === 'completed') {
         await this.checkAndUpdateLearningPathProgress(userId, seq.sequenceId);
       }
     }
   }
 
-  private async checkAndUpdateLearningPathProgress(
-    userId: string,
-    sequenceId: string
-  ): Promise<void> {
-    const paths = await db
+  private async checkAndUpdateLearningPathProgress(userId: string, sequenceId: string): Promise<void> {
+    const pathRows = await db
       .select()
       .from(learningPathSequences)
-      .where(eq(learningPathSequences.sequenceId, sequenceId));
+      .where(eq(learningPathSequences.sequenceId, sequenceId))
+      .execute();
 
-    for (const path of paths) {
+    for (const path of pathRows) {
       await this.ensureProgressRecord(userId, 'path', path.learningPathId);
 
-      const [result] = await db
+      const result = await db
         .select({
           completed_count: sql<number>`count(*) filter (where ${userSequenceProgress.status} = 'completed')`,
           total_count: sql<number>`count(*)`
@@ -543,11 +567,12 @@ export class ProgressTrackingService {
             eq(userSequenceProgress.userId, userId)
           )
         )
-        .where(eq(learningPathSequences.learningPathId, path.learningPathId));
+        .where(eq(learningPathSequences.learningPathId, path.learningPathId))
+        .execute()
+        .then(rows => rows[0]);
 
-      const completed_count = Number(result.completed_count) || 0;
-      const total_count = Number(result.total_count) || 0;
-
+      const completed_count = Number(result?.completed_count ?? 0);
+      const total_count = Number(result?.total_count ?? 0);
       const pathStatus: ProgressStatus =
         completed_count === 0
           ? 'not_started'
@@ -567,7 +592,8 @@ export class ProgressTrackingService {
             eq(userLearningPathProgress.userId, userId),
             eq(userLearningPathProgress.learningPathId, path.learningPathId)
           )
-        );
+        )
+        .execute();
     }
   }
-} 
+}

@@ -7,11 +7,15 @@ export interface ContentProgress {
   startedAt: Date | null;
   completedAt: Date | null;
   lastAccessedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ChunkProgress extends ContentProgress {
   contentChunkId: string;
   title?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ModuleProgress extends ContentProgress {

@@ -7,8 +7,8 @@ import { GetServerSidePropsContext } from 'next';
 type UpdateChunkProgressFn = (
   userId: string,
   contentChunkId: string,
-  status: string,
-  options?: { updateParents?: boolean; deferChunkUpdates?: boolean }
+  status: ProgressStatus,
+  options?: ProgressUpdateOptions
 ) => Promise<void>;
 
 type AuthFn = () => Promise<{
@@ -92,7 +92,9 @@ describe('User Progress API', () => {
       status: 'completed' as ProgressStatus,
       startedAt: mockDateObj,
       completedAt: mockDateObj,
-      lastAccessedAt: mockDateObj
+      lastAccessedAt: mockDateObj,
+      createdAt: mockDateObj,
+      updatedAt: mockDateObj
     },
     module: {
       id: '123e4567-e89b-12d3-a456-426614174003',
@@ -103,7 +105,9 @@ describe('User Progress API', () => {
       completedAt: mockDateObj,
       lastAccessedAt: mockDateObj,
       completedChunks: 5,
-      totalChunks: 5
+      totalChunks: 5,
+      createdAt: mockDateObj,
+      updatedAt: mockDateObj
     },
     sequence: {
       id: '123e4567-e89b-12d3-a456-426614174005',
@@ -114,7 +118,9 @@ describe('User Progress API', () => {
       completedAt: mockDateObj,
       lastAccessedAt: mockDateObj,
       completedModules: 3,
-      totalModules: 3
+      totalModules: 3,
+      createdAt: mockDateObj,
+      updatedAt: mockDateObj
     },
     learningPath: {
       id: '123e4567-e89b-12d3-a456-426614174007',
@@ -125,7 +131,9 @@ describe('User Progress API', () => {
       completedAt: null,
       lastAccessedAt: mockDateObj,
       completedSequences: 2,
-      totalSequences: 4
+      totalSequences: 4,
+      createdAt: mockDateObj,
+      updatedAt: mockDateObj
     }
   };
 
