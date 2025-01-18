@@ -1,6 +1,7 @@
+import { randomUUID } from 'crypto';
+
 import { and, eq, sql } from 'drizzle-orm/sql';
 import { z } from 'zod';
-import { randomUUID } from 'crypto';
 
 import { db } from '@/db';
 import {
@@ -597,3 +598,5 @@ export class ProgressTrackingService {
     }
   }
 }
+
+const progressService = new ProgressTrackingService();

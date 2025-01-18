@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { db } from '@/db';
 import { contentChunks } from '@/db/schema';
+
 import { ValidationError } from '../progress-tracking/errors';
 import { ProgressTrackingService, progressQueue } from '../progress-tracking/progress-service';
 

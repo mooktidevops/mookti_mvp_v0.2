@@ -1,7 +1,7 @@
 "use client";
 
-import { useChat } from 'ai/react';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
+import { useChat } from 'ai/react';
 import {
   CopyIcon,
   CornerDownLeft,
@@ -12,12 +12,14 @@ import {
   Send,
   Volume2,
 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useEffect, useRef, useState } from 'react';
 
+import CodeDisplayBlock from '@/components/code-display-block';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+
 import {
   ChatBubble,
   ChatBubbleAction,
@@ -26,7 +28,6 @@ import {
 } from './chat-bubble';
 import { ChatInput } from './chat-input';
 import { ChatMessageList } from './chat-message-list';
-import CodeDisplayBlock from '@/components/code-display-block';
 
 const ChatAiIcons = [
   {
