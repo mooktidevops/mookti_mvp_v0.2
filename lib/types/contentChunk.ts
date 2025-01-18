@@ -1,17 +1,7 @@
 // lib/types/contentChunk.ts
 import { DisplayType } from './displayType';
 
-export enum ContentChunkType {
-  lesson = 'lesson',
-  metalesson = 'metalesson',
-  introduction = 'introduction',
-  conclusion = 'conclusion',
-  example = 'example',
-  application = 'application',
-  image = 'image',
-  video = 'video',
-  assessment = 'assessment'
-}
+export type ContentChunkType = 'lesson' | 'metalesson' | 'introduction'| 'conclusion' | 'example' | 'application' | 'media' | 'assessment';
 
 export enum ContentChunkNextAction {
   getNext = 'getNext',
