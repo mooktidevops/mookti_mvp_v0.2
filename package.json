@@ -10,7 +10,7 @@
   "packageManager": "pnpm@9.14.4",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "tsx db/migrate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "seed-content-chunk": "tsx scripts/seedContentChunk.ts",
