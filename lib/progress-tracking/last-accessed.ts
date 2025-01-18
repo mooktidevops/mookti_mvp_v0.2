@@ -109,7 +109,9 @@ export async function getLastAccessedContent(userId: string): Promise<LastAccess
     const moduleProgress: ModuleProgress = {
       ...moduleProgressResult,
       completedChunks: Number(completedChunksResult?.value || 0),
-      totalChunks: Number(totalChunksResult?.value || 0)
+      totalChunks: Number(totalChunksResult?.value || 0),
+      createdAt: moduleProgressResult.createdAt || new Date(),
+      updatedAt: moduleProgressResult.updatedAt || new Date()
     };
 
     // Get sequence progress
@@ -164,7 +166,9 @@ export async function getLastAccessedContent(userId: string): Promise<LastAccess
     const sequenceProgress: SequenceProgress = {
       ...sequenceProgressResult,
       completedModules: Number(completedModulesResult?.value || 0),
-      totalModules: Number(totalModulesResult?.value || 0)
+      totalModules: Number(totalModulesResult?.value || 0),
+      createdAt: sequenceProgressResult.createdAt || new Date(),
+      updatedAt: sequenceProgressResult.updatedAt || new Date()
     };
 
     // Get learning path progress
@@ -219,7 +223,9 @@ export async function getLastAccessedContent(userId: string): Promise<LastAccess
     const learningPathProgress: LearningPathProgress = {
       ...learningPathProgressResult,
       completedSequences: Number(completedSequencesResult?.value || 0),
-      totalSequences: Number(totalSequencesResult?.value || 0)
+      totalSequences: Number(totalSequencesResult?.value || 0),
+      createdAt: learningPathProgressResult.createdAt || new Date(),
+      updatedAt: learningPathProgressResult.updatedAt || new Date()
     };
 
     return {
