@@ -13,7 +13,7 @@ import { rainbowColors } from '@/app/admin/content-studio/admin-styles';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { ContentChunk } from '@/lib/types/contentChunk';
+import { ContentChunk, ContentChunkType } from '@/lib/types/contentChunk';
 
 import { ChunkDetailModal } from '../ChunkDetailModal';
 import { ChunkForm } from '../ChunkForm';
@@ -609,7 +609,7 @@ export default function ModuleDetailPage() {
           onSuccess={handleChunkCreate}
           disabled={operationsStatus.form || isOperationInProgress}
           defaultValues={{
-            type: 'lesson',
+            type: ContentChunkType.lesson,
             module_id: module.id,
             sequence_order: (chunks.length || 0) + 1
           }}

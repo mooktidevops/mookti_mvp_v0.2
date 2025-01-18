@@ -196,7 +196,7 @@ export function ChunkForm({ module_id, chunk, onClose, onSuccess }: Props) {
         </div>
 
         {/* Media (if applicable) */}
-        {(type === ContentChunkType.image || type === ContentChunkType.video) && (
+        {type === ContentChunkType.media && (
           <div className="grid gap-2">
             <div className="text-sm font-medium">Media</div>
             <Button variant="outline" onClick={() => setShowMediaModal(true)}>
