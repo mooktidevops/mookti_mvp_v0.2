@@ -34,6 +34,6 @@
     ".next/types/**/*.ts",
     "next.config.js",
     "lib/types/**/*.d.ts"
-  ],
+, "sandbox/ui-2.0.js"  ],
   "exclude": ["node_modules"]
 }
