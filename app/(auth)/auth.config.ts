@@ -25,7 +25,7 @@ export const authConfig = {
       }
 
       if (isOnRegister) {
-        return false; // Prevents unregistered users from accessing register page on Vercel deployment before app launch
+        return true; // set to false for deployment to Prevent unregistered users from accessing register page on Vercel deployment before app launch
         // SET TO TRUE ON APP LAUNCH
       }
 

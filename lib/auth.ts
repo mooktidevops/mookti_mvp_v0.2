@@ -15,34 +15,51 @@ export const authOptions: NextAuthConfig = {
         email: {
           label: "Email",
           type: "text",
-          placeholder: "jsmith@example.com"
+          placeholder: "jsmith@example.com",
         },
         password: {
           label: "Password",
-          type: "password"
-        }
+          type: "password",
+        },
       },
       async authorize(credentials) {
-        // First, ensure credentials is defined
+        console.log("DEBUG: authorize called with credentials:", credentials);
+
+        // Ensure credentials are provided.
         if (!credentials) {
+          console.error("DEBUG: Missing credentials.");
           return null;
         }
 
-        // Check if credentials.email and credentials.password exist and are strings
-        if (typeof credentials.email !== 'string' || typeof credentials.password !== 'string') {
+        // Verify that email and password are strings.
+        if (
+          typeof credentials.email !== "string" ||
+          typeof credentials.password !== "string"
+        ) {
+          console.error("DEBUG: Invalid credential types:", credentials);
           return null;
         }
 
         const { email, password } = credentials;
         const users = await getUser(email);
+        console.log("DEBUG: getUser returned:", users);
 
-        if (users.length === 0) return null;
+        if (users.length === 0) {
+          console.error("DEBUG: No user found for email:", email);
+          return null;
+        }
 
         const dbUser = users[0];
         const passwordsMatch = await compare(password, dbUser.password!);
-        if (!passwordsMatch) return null;
+        console.log("DEBUG: Password comparison result:", passwordsMatch);
 
-        // At this point, email and password are known strings
+        if (!passwordsMatch) {
+          console.error("DEBUG: Password mismatch for email:", email);
+          return null;
+        }
+
+        console.log("DEBUG: Successful authentication for email:", email);
+        // Return the user object with necessary properties.
         return {
           id: dbUser.id,
           email: dbUser.email,
@@ -59,7 +76,7 @@ export const authOptions: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role; 
+        token.role = user.role;
       }
       return token;
     },
@@ -73,9 +90,4 @@ export const authOptions: NextAuthConfig = {
   },
 };
 
-export const {
-  handlers,
-  auth,
-  signIn,
-  signOut,
-} = NextAuth(authOptions);
+export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);

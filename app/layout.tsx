@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/custom/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
+  metadataBase: new URL('https://mookti.ai'),
   title: 'Mookti.AI',
   description: 'Next-generation, AI-powered educational platform from Mookti.AI',
 };

@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
-
-import { EnhancedChat } from '@/components/custom/enhanced-chat';
+import ChatInterface from '@/components/new-ui/chat-interface';
 import { DEFAULT_MODEL_NAME, models } from '@/helpers/ai/models';
 import { getInitialContentChunk } from '@/lib/content/getInitialContentChunk';
 import { generateUUID } from '@/lib/utils';
@@ -20,19 +19,19 @@ export default async function Page() {
 
   console.log("Initial content chunk in page.tsx:", initialContentChunk);
 
-  // Convert the content chunk to a message format
+  // Convert the content chunk to a message format using 'type' instead of 'role'
   const initialMessages = initialContentChunk
     ? [
         {
           id: generateUUID(),
-          role: 'system' as 'system',
+          type: 'system' as "system",
           content: initialContentChunk.content,
         },
       ]
     : [];
 
   return (
-    <EnhancedChat
+    <ChatInterface
       key={id}
       id={id}
       initialMessages={initialMessages}
