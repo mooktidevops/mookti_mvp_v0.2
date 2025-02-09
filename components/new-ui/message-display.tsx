@@ -3,6 +3,8 @@ import { MessageSquare, MoreVertical } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import CardBlock from "./card-block";
 import MultimediaBlock from "./multimedia-block";
+import { Avatar } from '@/components/custom/avatar';
+import { type User } from 'next-auth';
 
 /**
  * Block content types for messages.
@@ -35,14 +37,17 @@ export interface Message {
 
 interface MessageDisplayProps {
   message: Message;
+  user?: User;
 }
+
+const defaultUser: User = { email: 'default@example.com', role: 'user' };
 
 /**
  * MessageDisplay renders a chat message.
  * It adjusts the layout based on whether the message is from the user or the system.
  * If blockContent is provided, it renders either a CardBlock or MultimediaBlock based on the type.
  */
-const MessageDisplay: React.FC<MessageDisplayProps> = memo(({ message }) => {
+const MessageDisplay: React.FC<MessageDisplayProps> = memo(({ message, user }) => {
   const renderBlockContent = () => {
     if (!message.blockContent) return null;
 
@@ -76,7 +81,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = memo(({ message }) => {
               {message.content}
             </div>
             <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center ml-2 flex-shrink-0">
-              <MessageSquare className="w-4 h-4 text-gray-600" />
+              <Avatar user={user ?? defaultUser} />
             </div>
           </div>
         </div>

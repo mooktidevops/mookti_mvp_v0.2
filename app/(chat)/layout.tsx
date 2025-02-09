@@ -2,8 +2,8 @@ import { cookies } from 'next/headers';
 
 import { AppSidebar } from '@/components/custom/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-
 import { auth } from '../../lib/auth';
+import { Providers } from '@/components/new-ui/providers';
 
 export const experimental_ppr = true;
 
@@ -17,8 +17,10 @@ export default async function Layout({
 
   return (
     <SidebarProvider defaultOpen={!isCollapsed}>
-      <AppSidebar user={session?.user || undefined} />
-      <SidebarInset>{children}</SidebarInset>
+      <Providers session={session}>
+        <AppSidebar user={session?.user || undefined} />
+        <SidebarInset>{children}</SidebarInset>
+      </Providers>
     </SidebarProvider>
   );
 }

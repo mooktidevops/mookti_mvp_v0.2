@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { Toaster } from 'sonner';
-
-import { ThemeProvider } from '@/components/custom/theme-provider';
+import { authOptions } from '@/lib/auth';
+import { Providers } from '@/components/new-ui/providers';
 
 import './globals.css';
 
@@ -40,6 +39,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = null;
   return (
     <html
       lang="en"
@@ -57,15 +57,9 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
+        <Providers session={session}>
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -5,12 +5,15 @@ import { Menu, ArrowUp } from 'lucide-react';
 import MessageDisplay, { Message } from './message-display';
 import SuggestedResponseBlock, { SuggestedResponse } from './suggested-response-block';
 import { generateUUID } from '@/lib/utils';
+import { AppSidebar } from './app-sidebar';
+import { type User } from 'next-auth';
 
 interface ChatInterfaceProps {
   id: string;
   initialMessages: Message[];
   selectedModelId: string;
   initialChunk: any; // Replace 'any' with a more specific type if available
+  user?: User;
 }
 
 /**
@@ -24,6 +27,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   initialMessages,
   selectedModelId,
   initialChunk,
+  user,
 }) => {
   // Sidebar visibility state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -41,11 +45,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     { id: '3', text: 'What will I learn?' },
   ]);
 
-  // Auto-resize the textarea as the user types
+  // Add state for checking if the textarea is multiline
+  const [isMultiline, setIsMultiline] = useState(false);
+
+  const defaultHeight = 56;
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = '24px';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = inputValue ? `${textareaRef.current.scrollHeight}px` : `${defaultHeight}px`;
+    }
+  }, [inputValue]);
+
+  // Check if the textarea is multiline based on its computed height
+  useEffect(() => {
+    if (textareaRef.current) {
+      const computedHeight = parseInt(window.getComputedStyle(textareaRef.current).height, 10);
+      // 56px is the minimum height as defined by min-h-[56px]
+      setIsMultiline(computedHeight > 56);
     }
   }, [inputValue]);
 
@@ -89,52 +105,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </button>
 
         <div className="flex gap-8 max-w-6xl mx-auto h-full">
-          {/* Sidebar with Chat History */}
+          {/* Sidebar with Chat History & functionalities from the old sidebar */}
           {isSidebarOpen && (
-            <aside className="w-64 bg-gray-800 text-white rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-4">Chat History</h2>
-              <nav className="space-y-2">
-                <div className="p-2 bg-gray-700 rounded">Previous Chat 1</div>
-                <div className="p-2 hover:bg-gray-700 rounded cursor-pointer">
-                  Previous Chat 2
-                </div>
-                <div className="p-2 hover:bg-gray-700 rounded cursor-pointer">
-                  Previous Chat 3
-                </div>
-              </nav>
+            <aside className="w-64 h-full bg-white border border-gray-200 rounded-lg p-4 shadow">
+              <AppSidebar user={user} />
             </aside>
           )}
 
           {/* Main Chat Area */}
-          <main className="flex-1 flex flex-col bg-white rounded-lg">
+          <main className="flex-1 flex flex-col bg-white rounded-lg shadow">
             {/* Message List */}
             <div className="flex-1 overflow-y-auto p-6">
               <div className="max-w-4xl mx-auto space-y-6">
                 {messages.map((message, index) => (
                   <div key={index} className="grid grid-cols-5 gap-4">
-                    <MessageDisplay message={message} />
+                    <MessageDisplay message={message} user={user} />
                   </div>
                 ))}
               </div>
+              <div className="mt-6">
+                <SuggestedResponseBlock suggestedResponses={suggestedResponses} onSuggestionClick={handleSuggestionClick} />
+              </div>
             </div>
 
-            {/* Input Area & Suggested Responses */}
+            {/* Input Area */}
             <div className="p-4">
-              <SuggestedResponseBlock
-                suggestedResponses={suggestedResponses}
-                onSuggestionClick={handleSuggestionClick}
-              />
-              <div className="relative">
+              <div className="flex items-center">
                 <textarea
+                  rows={1}
+                  onFocus={() => { if (!inputValue && textareaRef.current) { textareaRef.current.style.height = `${defaultHeight}px`; } }}
                   ref={textareaRef}
                   value={inputValue}
                   onChange={handleInputChange}
                   placeholder="Type your message..."
-                  className="w-full resize-none overflow-hidden py-4 px-8 pr-16 focus:outline-none min-h-[56px] max-h-96 border border-gray-200 bg-gray-50 rounded-full"
+                  className="w-full resize-none overflow-hidden py-4 px-8 focus:outline-none min-h-[56px] max-h-96 border border-gray-200 bg-gray-50 rounded-full"
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="absolute right-7 bottom-7 p-2 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center"
+                  className="ml-4 p-1 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center"
                   aria-label="Send message"
                 >
                   <ArrowUp className="w-5 h-5 text-white" />

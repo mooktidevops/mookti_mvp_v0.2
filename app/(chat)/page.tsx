@@ -30,6 +30,9 @@ export default async function Page() {
       ]
     : [];
 
+  // Pass user data if available (replace with your session logic if needed)
+  const user = undefined;
+
   return (
     <ChatInterface
       key={id}
@@ -37,6 +40,7 @@ export default async function Page() {
       initialMessages={initialMessages}
       selectedModelId={selectedModelId}
       initialChunk={initialContentChunk}
+      user={user}
     />
   );
 }
